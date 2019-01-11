@@ -60,11 +60,11 @@ impl Default for Registers {
 macro_rules! getter_and_setter {
   (8bits $([$reg:ident, $setter:ident]),*) => {
     $(
-      fn $reg (&self) -> u8 {
+      pub fn $reg (&self) -> u8 {
         self.$reg
       }
 
-      fn $setter (&mut self, val: u8) {
+      pub fn $setter (&mut self, val: u8) {
         self.$reg = val;
       }
     )*
@@ -72,11 +72,11 @@ macro_rules! getter_and_setter {
 
   (16bits $([$reg:ident, $setter:ident]),*) => {
     $(
-      fn $reg (&self) -> u16 {
+      pub fn $reg (&self) -> u16 {
         self.$reg
       }
 
-      fn $setter (&mut self, val: u16) {
+      pub fn $setter (&mut self, val: u16) {
         self.$reg = val;
       }
     )*
@@ -84,14 +84,14 @@ macro_rules! getter_and_setter {
 
   (16bits $([$regL:ident + $regH:ident, $getter:ident, $setter:ident]),*) => {
     $(
-      fn $getter (&self) -> u16 {
+      pub fn $getter (&self) -> u16 {
         let l = (self.$regL as u16) << 8;
         let h = (self.$regH as u16) << 0;
 
         l + h
       }
 
-      fn $setter(&mut self, val: u16) {
+      pub fn $setter(&mut self, val: u16) {
         let l = ((val & 0xff00) >> 8) as u8;
         let h = ((val & 0x00ff) >> 0) as u8;
 
@@ -105,11 +105,11 @@ macro_rules! getter_and_setter {
 macro_rules! flag_getter_and_setter {
   ($([$flag:ident, $setter:ident]),*) => {
     $(
-      fn $flag (&self) -> bool {
+      pub fn $flag (&self) -> bool {
         self.f.$flag
       }
 
-      fn $setter (&mut self, val: bool) {
+      pub fn $setter (&mut self, val: bool) {
         self.f.$flag = val;
       }
     )*
