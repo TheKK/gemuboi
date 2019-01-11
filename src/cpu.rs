@@ -1,6 +1,7 @@
 use crate::registers::Registers;
 use crate::mmu::Mmu;
 
+use crate::opcode::control;
 
 pub struct Cycle(pub u8);
 pub struct OpLength(pub u8);
@@ -27,6 +28,7 @@ impl Cpu {
 
 fn op_table(op_code: u8) -> OpFn {
   match op_code {
+    0x00 => &control::nop,
     _ => &unimplement_op_fn,
   }
 }

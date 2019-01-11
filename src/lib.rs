@@ -2,3 +2,5 @@
 pub mod mmu;
 pub mod registers;
 pub mod cpu;
+
+mod opcode;
