@@ -11,7 +11,7 @@ fn unimplement_op_fn(_: &mut Cpu) -> (Cycle, OpLength) {
   unimplemented!("Op code is not implemented yet");
 }
 
-#[derive(Default)]
+#[derive(Default, PartialEq, Clone)]
 pub struct Cpu {
   pub(crate) registers: Registers,
   pub(crate) mmu: Mmu,

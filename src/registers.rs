@@ -1,6 +1,7 @@
 use std::default::Default;
 
 /// Magic flag
+#[derive(Debug, PartialEq, Clone)]
 pub struct Flag {
   zero: bool,
   add_sub: bool,
@@ -19,6 +20,7 @@ impl Default for Flag {
   }
 }
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct Registers {
   a: u8,
 

@@ -7,6 +7,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 pub const MEM_SIZE: usize = 1024;
 
+#[derive(Clone)]
 pub struct Mmu {
   memory: [u8; MEM_SIZE],
 }
@@ -14,6 +15,12 @@ pub struct Mmu {
 impl Default for Mmu {
   fn default() -> Self {
     Self { memory: [0; 1024] }
+  }
+}
+
+impl PartialEq for Mmu {
+  fn eq(&self, rhs: &Self) -> bool {
+    self.memory[..] == rhs.memory[..]
   }
 }
 
@@ -47,7 +54,6 @@ impl Mmu {
   pub fn write_word(&mut self, addr: usize, value: u16) -> Result<()> {
     self.memory.get(addr).ok_or(Error::OutOfBound)?;
     self.memory.get(addr + 1).ok_or(Error::OutOfBound)?;
-
 
     self.memory[addr] = ((value & 0xff00) >> 8) as u8;
     self.memory[addr + 1] = (value & 0x00ff) as u8;
