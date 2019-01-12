@@ -4,10 +4,6 @@ use crate::registers::Registers;
 
 use super::ld_utils::{ld, load_from_reg, store_to_reg};
 
-// macro_rules! ff {
-//     () => {};
-// }
-
 macro_rules! ld_reg_reg_fn {
     // src and dest are the same.
     ($fn_name:ident) => {
