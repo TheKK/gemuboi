@@ -30,10 +30,10 @@ mod test {
   use super::*;
 
   use crate::opcode::ld_utils::{LoadByteFromRegFn, StoreByteToRegFn};
-  use crate::opcode::types::Operation;
+  use crate::opcode::types::Instruction;
 
   fn test_ld_d8(
-    op_to_test: &Operation,
+    op_to_test: &Instruction,
     load_from_reg: &LoadByteFromRegFn,
     store_to_reg: &StoreByteToRegFn,
   ) {
