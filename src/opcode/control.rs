@@ -1,20 +1,20 @@
 use crate::cpu::{Cpu, Cycle, OpLength};
 
 pub fn nop(_: &mut Cpu) -> (Cycle, OpLength) {
-  (Cycle(4), OpLength(1))
+    (Cycle(4), OpLength(1))
 }
 
 #[cfg(test)]
 mod test {
-  use super::*;
+    use super::*;
 
-  #[test]
-  fn run_nop() {
-    let cpu = Cpu::default();
+    #[test]
+    fn run_nop() {
+        let cpu = Cpu::default();
 
-    let mut new_cpu = cpu.clone();
-    nop(&mut new_cpu);
+        let mut new_cpu = cpu.clone();
+        nop(&mut new_cpu);
 
-    assert!(cpu == new_cpu);
-  }
+        assert!(cpu == new_cpu);
+    }
 }

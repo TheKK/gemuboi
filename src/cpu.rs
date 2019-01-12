@@ -1,8 +1,9 @@
-use crate::registers::Registers;
 use crate::mmu::Mmu;
+use crate::registers::Registers;
 
 use crate::opcode::control;
 use crate::opcode::ld_reg_d8;
+use crate::opcode::ld_reg_reg;
 
 pub struct Cycle(pub u8);
 pub struct OpLength(pub u8);
@@ -10,21 +11,21 @@ pub struct OpLength(pub u8);
 type OpFn = &'static Fn(&mut Cpu) -> (Cycle, OpLength);
 
 fn unimplement_op_fn(_: &mut Cpu) -> (Cycle, OpLength) {
-  unimplemented!("Op code is not implemented yet");
+    unimplemented!("Op code is not implemented yet");
 }
 
 #[derive(Default, PartialEq, Clone)]
 pub struct Cpu {
-  pub(crate) registers: Registers,
-  pub(crate) mmu: Mmu,
+    pub(crate) registers: Registers,
+    pub(crate) mmu: Mmu,
 }
 
 impl Cpu {
-  fn execute_instruction(&mut self, op_code: u8) -> u8 {
-    let (Cycle(cycle), OpLength(_len)) = op_table(op_code)(self);
+    fn execute_instruction(&mut self, op_code: u8) -> u8 {
+        let (Cycle(cycle), OpLength(_len)) = op_table(op_code)(self);
 
-    cycle
-  }
+        cycle
+    }
 }
 
 fn op_table(op_code: u8) -> OpFn {
