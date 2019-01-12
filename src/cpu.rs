@@ -21,7 +21,7 @@ pub struct Cpu {
 
 impl Cpu {
   fn execute_instruction(&mut self, op_code: u8) -> u8 {
-    let (Cycle(cycle), OpLength(len)) = op_table(op_code)(self);
+    let (Cycle(cycle), OpLength(_len)) = op_table(op_code)(self);
 
     cycle
   }

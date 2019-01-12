@@ -85,8 +85,8 @@ macro_rules! getter_and_setter {
   (16bits $([$regL:ident + $regH:ident, $getter:ident, $setter:ident]),*) => {
     $(
       pub fn $getter (&self) -> u16 {
-        let l = (self.$regL as u16) << 8;
-        let h = (self.$regH as u16) << 0;
+        let l = u16::from(self.$regL) << 8;
+        let h = u16::from(self.$regH) << 0;
 
         l + h
       }

@@ -1,6 +1,6 @@
 use crate::cpu::{Cpu, Cycle, OpLength};
 
-pub fn nop(cpu: &mut Cpu) -> (Cycle, OpLength) {
+pub fn nop(_: &mut Cpu) -> (Cycle, OpLength) {
   (Cycle(4), OpLength(1))
 }
 

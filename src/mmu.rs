@@ -32,12 +32,14 @@ impl Mmu {
 
   #[inline]
   pub fn read_word(&self, addr: usize) -> Result<u16> {
-    let l = self.memory.get(addr).cloned().ok_or(Error::OutOfBound)? as u16;
-    let h = self
-      .memory
-      .get(addr + 1)
-      .cloned()
-      .ok_or(Error::OutOfBound)? as u16;
+    let l = u16::from(self.memory.get(addr).cloned().ok_or(Error::OutOfBound)?);
+    let h = u16::from(
+      self
+        .memory
+        .get(addr + 1)
+        .cloned()
+        .ok_or(Error::OutOfBound)?,
+    );
 
     Ok((l << 8) + h)
   }
