@@ -1,4 +1,5 @@
-use crate::cpu::{Cpu, Cycle, OpLength};
+use crate::cpu::Cpu;
+use crate::opcode::table::{Cycle, OpLength};
 use crate::registers::Registers;
 
 use super::ld_utils::{ld, read_byte_from_pc_offset, store_to_reg};

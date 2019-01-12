@@ -1,4 +1,5 @@
-use crate::cpu::{Cpu, Cycle, OpLength};
+use crate::cpu::Cpu;
+use crate::opcode::table::{Cycle, OpLength};
 
 pub fn nop(_: &mut Cpu) -> (Cycle, OpLength) {
     (Cycle(4), OpLength(1))
