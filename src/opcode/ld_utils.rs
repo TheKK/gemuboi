@@ -11,6 +11,8 @@ pub type StoreToRegFn<S> = Fn(&mut Registers, S);
 pub type LoadByteFromRegFn = LoadFromRegFn<u8>;
 pub type StoreByteToRegFn = StoreToRegFn<u8>;
 
+pub type LoadWordFromRegFn = LoadFromRegFn<u16>;
+
 #[inline]
 pub fn read_byte_from_pc_offset(offset: usize) -> impl Fn(&Cpu) -> mmu::Result<u8> {
     move |cpu| {
@@ -26,6 +28,17 @@ pub fn load_from_reg<S>(from_reg: &'static LoadFromRegFn<S>) -> impl Fn(&Cpu) ->
         let value = from_reg(&cpu.registers);
 
         Ok(value)
+    }
+}
+
+#[inline]
+pub fn load_byte_from_reg_dref(
+    from_reg: &'static LoadWordFromRegFn,
+) -> impl Fn(&Cpu) -> mmu::Result<u8> {
+    move |cpu: &Cpu| {
+        let addr = from_reg(&cpu.registers);
+
+        cpu.mmu.read_byte(usize::from(addr))
     }
 }
 

@@ -1,6 +1,7 @@
 use crate::cpu::Cpu;
 use crate::opcode::control;
 use crate::opcode::ld_reg_d8;
+use crate::opcode::ld_reg_dref;
 use crate::opcode::ld_reg_reg;
 
 type OpFn = &'static Fn(&mut Cpu) -> (Cycle, OpLength);
@@ -81,6 +82,18 @@ pub fn op_table(op_code: u8) -> OpFn {
         0x6B => &ld_reg_reg::ld_l_e,
         0x6C => &ld_reg_reg::ld_l_h,
         0x6D => &ld_reg_reg::ld_l_l,
+
+        // ld reg dref
+        0x0A => &ld_reg_dref::ld_a_bc_dref,
+        0x1A => &ld_reg_dref::ld_a_de_dref,
+
+        0x46 => &ld_reg_dref::ld_b_hl_dref,
+        0x4E => &ld_reg_dref::ld_c_hl_dref,
+        0x56 => &ld_reg_dref::ld_d_hl_dref,
+        0x5E => &ld_reg_dref::ld_e_hl_dref,
+        0x66 => &ld_reg_dref::ld_h_hl_dref,
+        0x6E => &ld_reg_dref::ld_l_hl_dref,
+        0x7E => &ld_reg_dref::ld_a_hl_dref,
 
         _ => &unimplement_op_fn,
     }
