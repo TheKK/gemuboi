@@ -2,7 +2,9 @@ use crate::cpu::Cpu;
 use crate::opcode::table::{Cycle, OpLength};
 use crate::registers::Registers;
 
-use super::ld_utils::{ld, load_byte_from_reg_dref, store_to_reg};
+use super::ld_utils::{
+    ld, load_byte_from_reg_dref, read_byte_from_pc_offset, read_word_from_pc_offset, store_to_reg,
+};
 
 macro_rules! ld_reg_dref_fn {
     ($fn_name:ident, ($addr_reg:ident) > $store_to:ident) => {
@@ -55,6 +57,49 @@ pub fn ldd_a_hl_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
     cpu.registers.set_hl(hl - 1);
 
     (Cycle(8), OpLength(1))
+}
+
+#[inline]
+pub fn ldh_a_a8_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
+    ld(
+        cpu,
+        &|cpu| {
+            let addr = 0xFF00 + usize::from(read_byte_from_pc_offset(1)(cpu).unwrap());
+            cpu.mmu.read_byte(addr)
+        },
+        &store_to_reg(&Registers::set_a),
+    );
+
+    (Cycle(12), OpLength(2))
+}
+
+#[inline]
+pub fn ld_a_a16_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
+    ld(
+        cpu,
+        &|cpu| {
+            let addr = usize::from(read_word_from_pc_offset(1)(cpu).unwrap());
+            cpu.mmu.read_byte(addr)
+        },
+        &store_to_reg(&Registers::set_a),
+    );
+
+    (Cycle(16), OpLength(3))
+}
+
+#[inline]
+pub fn ld_a_c_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
+    ld(
+        cpu,
+        &|cpu| {
+            let addr = 0xFF00 + usize::from(cpu.registers.c());
+            cpu.mmu.read_byte(addr)
+        },
+        &store_to_reg(&Registers::set_a),
+    );
+
+    // TODO length 2?
+    (Cycle(8), OpLength(2))
 }
 
 #[cfg(test)]
@@ -149,6 +194,103 @@ mod test {
         // Assert: other state.
         init_cpu.registers.set_a(the_value);
         init_cpu.registers.set_hl((the_addr - 1) as u16);
+        assert!(init_cpu == modified_cpu);
+    }
+
+    #[test]
+    fn run_ldh_a_a8_dref() {
+        // Arrange: prepare cpu.
+        let the_pc = 0x00;
+
+        let the_higher_addr: usize = 0xFF00;
+        let the_lower_addr: u8 = 0x09;
+        let the_addr = the_higher_addr + (the_lower_addr as usize);
+
+        let the_value = 0x42;
+
+        let mut init_cpu = Cpu::default();
+        init_cpu.registers.set_pc(the_pc);
+        init_cpu.mmu.write_byte(0x00, 0xf0).unwrap();
+        init_cpu.mmu.write_byte(0x01, the_lower_addr).unwrap();
+        init_cpu.mmu.write_byte(the_addr, the_value).unwrap();
+
+        let mut modified_cpu = init_cpu.clone();
+
+        // Action.
+        ldh_a_a8_dref(&mut modified_cpu);
+
+        // Assert: check register value.
+        let actual_value = modified_cpu.registers.a();
+        assert_eq!(actual_value, the_value);
+
+        // Assert: other state.
+        init_cpu.registers.set_a(the_value);
+        assert!(init_cpu == modified_cpu);
+    }
+
+    #[test]
+    fn run_ld_a_a16_dref() {
+        // Arrange: prepare cpu.
+        let the_pc = 0x00;
+
+        let the_higher_addr = 0x33;
+        let the_lower_addr = 0x09;
+        let the_addr = ((the_higher_addr as usize) << 8) + (the_lower_addr as usize);
+
+        let the_value = 0x42;
+
+        let mut init_cpu = Cpu::default();
+        init_cpu.registers.set_pc(the_pc);
+        init_cpu.mmu.write_byte(0x00, 0xf0).unwrap();
+        init_cpu.mmu.write_byte(0x01, the_higher_addr).unwrap();
+        init_cpu.mmu.write_byte(0x02, the_lower_addr).unwrap();
+        init_cpu.mmu.write_byte(the_addr, the_value).unwrap();
+
+        let mut modified_cpu = init_cpu.clone();
+
+        // Action.
+        ld_a_a16_dref(&mut modified_cpu);
+
+        // Assert: check register value.
+        let actual_value = modified_cpu.registers.a();
+        assert_eq!(actual_value, the_value);
+
+        // Assert: other state.
+        init_cpu.registers.set_a(the_value);
+        assert!(init_cpu == modified_cpu);
+    }
+
+    #[test]
+    fn run_ld_a_c_dref() {
+        // Arrange: prepare cpu.
+        let the_pc = 0x00;
+
+        let the_higher_addr: u16 = 0xFF00;
+        let the_lower_addr: u8 = 0x09;
+        let the_addr = the_higher_addr + (the_lower_addr as u16);
+
+        let the_value = 0x42;
+
+        let mut init_cpu = Cpu::default();
+        init_cpu.registers.set_pc(the_pc);
+        init_cpu.registers.set_c(the_lower_addr);
+        init_cpu.mmu.write_byte(0x00, 0xf0).unwrap();
+        init_cpu
+            .mmu
+            .write_byte(the_addr as usize, the_value)
+            .unwrap();
+
+        let mut modified_cpu = init_cpu.clone();
+
+        // Action.
+        ld_a_c_dref(&mut modified_cpu);
+
+        // Assert: check register value.
+        let actual_value = modified_cpu.registers.a();
+        assert_eq!(actual_value, the_value);
+
+        // Assert: other state.
+        init_cpu.registers.set_a(the_value);
         assert!(init_cpu == modified_cpu);
     }
 }
