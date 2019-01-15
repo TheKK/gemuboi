@@ -95,6 +95,10 @@ pub fn op_table(op_code: u8) -> OpFn {
         0x6E => &ld_reg_dref::ld_l_hl_dref,
         0x7E => &ld_reg_dref::ld_a_hl_dref,
 
+        // ldh a hl dref
+        0x2A => &ld_reg_dref::ldi_a_hl_dref,
+        0x3A => &ld_reg_dref::ldd_a_hl_dref,
+
         _ => &unimplement_op_fn,
     }
 }
