@@ -5,7 +5,7 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub const MEM_SIZE: usize = 1024;
+pub const MEM_SIZE: usize = 0xFFFF;
 
 #[derive(Clone)]
 pub struct Mmu {
@@ -14,7 +14,9 @@ pub struct Mmu {
 
 impl Default for Mmu {
     fn default() -> Self {
-        Self { memory: [0; 1024] }
+        Self {
+            memory: [0; MEM_SIZE],
+        }
     }
 }
 
