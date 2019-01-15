@@ -23,6 +23,15 @@ pub fn read_byte_from_pc_offset(offset: usize) -> impl Fn(&Cpu) -> mmu::Result<u
 }
 
 #[inline]
+pub fn read_word_from_pc_offset(offset: usize) -> impl Fn(&Cpu) -> mmu::Result<u16> {
+    move |cpu| {
+        let pc = cpu.registers.pc() as usize;
+
+        cpu.mmu.read_word(pc + offset)
+    }
+}
+
+#[inline]
 pub fn load_from_reg<S>(from_reg: &'static LoadFromRegFn<S>) -> impl Fn(&Cpu) -> mmu::Result<S> {
     move |cpu: &Cpu| {
         let value = from_reg(&cpu.registers);
