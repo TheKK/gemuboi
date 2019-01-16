@@ -63,6 +63,17 @@ pub fn store_to_reg<S>(
 }
 
 #[inline]
+pub fn store_to_reg_dref(
+    the_reg: &'static LoadWordFromRegFn,
+) -> impl Fn(&mut Cpu, u8) -> mmu::Result<()> {
+    move |cpu: &mut Cpu, v: u8| {
+        let the_addr = the_reg(&mut cpu.registers);
+
+        cpu.mmu.write_byte(the_addr as usize, v)
+    }
+}
+
+#[inline]
 pub fn ld<S>(cpu: &mut Cpu, load_from: &LoadFromFn<S>, store_to: &StoreToFn<S>) {
     load_from(cpu)
         .and_then(|value| store_to(cpu, value))
