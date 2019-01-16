@@ -1,3 +1,5 @@
+use std::fmt;
+
 #[derive(Debug, PartialEq)]
 pub enum Error {
     OutOfBound,
@@ -17,6 +19,14 @@ impl Default for Mmu {
         Self {
             memory: [0; MEM_SIZE],
         }
+    }
+}
+
+impl fmt::Debug for Mmu {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_struct("Mmu")
+            .field("memoryr", &self.memory.to_vec())
+            .finish()
     }
 }
 

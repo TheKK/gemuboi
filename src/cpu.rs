@@ -2,7 +2,7 @@ use crate::mmu::Mmu;
 use crate::opcode::table::{op_table, Cycle, OpLength};
 use crate::registers::Registers;
 
-#[derive(Default, PartialEq, Clone)]
+#[derive(Default, PartialEq, Debug, Clone)]
 pub struct Cpu {
     pub(crate) registers: Registers,
     pub(crate) mmu: Mmu,
