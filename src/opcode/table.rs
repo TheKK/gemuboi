@@ -1,5 +1,6 @@
 use crate::cpu::Cpu;
 use crate::opcode::control;
+use crate::opcode::ld_dref_reg;
 use crate::opcode::ld_reg_d8;
 use crate::opcode::ld_reg_dref;
 use crate::opcode::ld_reg_reg;
@@ -102,6 +103,18 @@ pub fn op_table(op_code: u8) -> OpFn {
         0xF0 => &ld_reg_dref::ldh_a_a8_dref,
         0xFA => &ld_reg_dref::ld_a_a16_dref,
         0xF2 => &ld_reg_dref::ld_a_c_dref,
+
+        // ld dref reg
+        0x02 => &ld_dref_reg::ld_bc_dref_a,
+        0x12 => &ld_dref_reg::ld_de_dref_a,
+
+        0x77 => &ld_dref_reg::ld_hl_dref_a,
+        0x70 => &ld_dref_reg::ld_hl_dref_b,
+        0x71 => &ld_dref_reg::ld_hl_dref_c,
+        0x72 => &ld_dref_reg::ld_hl_dref_d,
+        0x73 => &ld_dref_reg::ld_hl_dref_e,
+        0x74 => &ld_dref_reg::ld_hl_dref_h,
+        0x75 => &ld_dref_reg::ld_hl_dref_l,
 
         _ => &unimplement_op_fn,
     }
