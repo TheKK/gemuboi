@@ -14,18 +14,18 @@ pub type StoreByteToRegFn = StoreToRegFn<u8>;
 pub type LoadWordFromRegFn = LoadFromRegFn<u16>;
 
 #[inline]
-pub fn read_byte_from_pc_offset(offset: usize) -> impl Fn(&Cpu) -> mmu::Result<u8> {
+pub fn read_byte_from_pc_offset(offset: u16) -> impl Fn(&Cpu) -> mmu::Result<u8> {
     move |cpu| {
-        let pc = cpu.registers.pc() as usize;
+        let pc = cpu.registers.pc();
 
         cpu.mmu.read_byte(pc + offset)
     }
 }
 
 #[inline]
-pub fn read_word_from_pc_offset(offset: usize) -> impl Fn(&Cpu) -> mmu::Result<u16> {
+pub fn read_word_from_pc_offset(offset: u16) -> impl Fn(&Cpu) -> mmu::Result<u16> {
     move |cpu| {
-        let pc = cpu.registers.pc() as usize;
+        let pc = cpu.registers.pc();
 
         cpu.mmu.read_word(pc + offset)
     }
@@ -47,7 +47,7 @@ pub fn load_byte_from_reg_dref(
     move |cpu: &Cpu| {
         let addr = from_reg(&cpu.registers);
 
-        cpu.mmu.read_byte(usize::from(addr))
+        cpu.mmu.read_byte(addr)
     }
 }
 
@@ -69,7 +69,7 @@ pub fn store_to_reg_dref(
     move |cpu: &mut Cpu, v: u8| {
         let the_addr = the_reg(&mut cpu.registers);
 
-        cpu.mmu.write_byte(the_addr as usize, v)
+        cpu.mmu.write_byte(the_addr, v)
     }
 }
 

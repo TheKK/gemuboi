@@ -6,18 +6,19 @@ pub enum Error {
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
+pub type Addr = u16;
 
-pub const MEM_SIZE: usize = 0xFFFF;
+pub const MEM_SIZE: u16 = 0xFFFF;
 
 #[derive(Clone)]
 pub struct Mmu {
-    memory: [u8; MEM_SIZE],
+    memory: [u8; MEM_SIZE as usize],
 }
 
 impl Default for Mmu {
     fn default() -> Self {
         Self {
-            memory: [0; MEM_SIZE],
+            memory: [0; MEM_SIZE as usize],
         }
     }
 }
@@ -38,12 +39,16 @@ impl PartialEq for Mmu {
 
 impl Mmu {
     #[inline]
-    pub fn read_byte(&self, addr: usize) -> Result<u8> {
+    pub fn read_byte(&self, addr: Addr) -> Result<u8> {
+        let addr = addr as usize;
+
         self.memory.get(addr).cloned().ok_or(Error::OutOfBound)
     }
 
     #[inline]
-    pub fn read_word(&self, addr: usize) -> Result<u16> {
+    pub fn read_word(&self, addr: Addr) -> Result<u16> {
+        let addr = addr as usize;
+
         let l = u16::from(self.memory.get(addr).cloned().ok_or(Error::OutOfBound)?);
         let h = u16::from(
             self.memory
@@ -56,7 +61,9 @@ impl Mmu {
     }
 
     #[inline]
-    pub fn write_byte(&mut self, addr: usize, value: u8) -> Result<()> {
+    pub fn write_byte(&mut self, addr: Addr, value: u8) -> Result<()> {
+        let addr = addr as usize;
+
         let byte = self.memory.get_mut(addr).ok_or(Error::OutOfBound)?;
         *byte = value;
 
@@ -64,7 +71,9 @@ impl Mmu {
     }
 
     #[inline]
-    pub fn write_word(&mut self, addr: usize, value: u16) -> Result<()> {
+    pub fn write_word(&mut self, addr: Addr, value: u16) -> Result<()> {
+        let addr = addr as usize;
+
         self.memory.get(addr).ok_or(Error::OutOfBound)?;
         self.memory.get(addr + 1).ok_or(Error::OutOfBound)?;
 
@@ -106,8 +115,6 @@ mod test {
         };
 
         test(MEM_SIZE);
-        test(MEM_SIZE + 1);
-        test(MEM_SIZE + 10);
     }
 
     #[test]
@@ -138,8 +145,5 @@ mod test {
 
         test(MEM_SIZE - 1);
         test(MEM_SIZE);
-        test(MEM_SIZE + 1);
-        test(MEM_SIZE + 2);
-        test(MEM_SIZE + 10);
     }
 }

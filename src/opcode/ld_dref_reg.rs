@@ -50,7 +50,7 @@ mod test {
                 let mut expected_cpu = actual_cpu.clone();
                 expected_cpu
                     .mmu
-                    .write_byte(the_addr as usize, the_value)
+                    .write_byte(the_addr, the_value)
                     .unwrap();
 
                 // Action.cpu

@@ -64,7 +64,7 @@ pub fn ldh_a_a8_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
     ld(
         cpu,
         &|cpu| {
-            let addr = 0xFF00 + usize::from(read_byte_from_pc_offset(1)(cpu).unwrap());
+            let addr = 0xFF00 + u16::from(read_byte_from_pc_offset(1)(cpu).unwrap());
             cpu.mmu.read_byte(addr)
         },
         &store_to_reg(&Registers::set_a),
@@ -78,7 +78,7 @@ pub fn ld_a_a16_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
     ld(
         cpu,
         &|cpu| {
-            let addr = usize::from(read_word_from_pc_offset(1)(cpu).unwrap());
+            let addr = read_word_from_pc_offset(1)(cpu).unwrap();
             cpu.mmu.read_byte(addr)
         },
         &store_to_reg(&Registers::set_a),
@@ -92,7 +92,7 @@ pub fn ld_a_c_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
     ld(
         cpu,
         &|cpu| {
-            let addr = 0xFF00 + usize::from(cpu.registers.c());
+            let addr = 0xFF00 + u16::from(cpu.registers.c());
             cpu.mmu.read_byte(addr)
         },
         &store_to_reg(&Registers::set_a),
@@ -202,9 +202,9 @@ mod test {
         // Arrange: prepare cpu.
         let the_pc = 0x00;
 
-        let the_higher_addr: usize = 0xFF00;
+        let the_higher_addr: u16 = 0xFF00;
         let the_lower_addr: u8 = 0x09;
-        let the_addr = the_higher_addr + (the_lower_addr as usize);
+        let the_addr = the_higher_addr + (the_lower_addr as u16);
 
         let the_value = 0x42;
 
@@ -235,7 +235,7 @@ mod test {
 
         let the_higher_addr = 0x33;
         let the_lower_addr = 0x09;
-        let the_addr = ((the_higher_addr as usize) << 8) + (the_lower_addr as usize);
+        let the_addr = ((the_higher_addr as u16) << 8) + (the_lower_addr as u16);
 
         let the_value = 0x42;
 
@@ -275,10 +275,7 @@ mod test {
         init_cpu.registers.set_pc(the_pc);
         init_cpu.registers.set_c(the_lower_addr);
         init_cpu.mmu.write_byte(0x00, 0xf0).unwrap();
-        init_cpu
-            .mmu
-            .write_byte(the_addr as usize, the_value)
-            .unwrap();
+        init_cpu.mmu.write_byte(the_addr, the_value).unwrap();
 
         let mut modified_cpu = init_cpu.clone();
 
