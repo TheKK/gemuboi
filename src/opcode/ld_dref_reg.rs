@@ -48,10 +48,7 @@ mod test {
                 actual_cpu.registers.$val_reg_setter(the_value);
 
                 let mut expected_cpu = actual_cpu.clone();
-                expected_cpu
-                    .mmu
-                    .write_byte(the_addr, the_value)
-                    .unwrap();
+                expected_cpu.mmu.write_byte(the_addr, the_value).unwrap();
 
                 // Action.cpu
                 $ins_to_test(&mut actual_cpu);

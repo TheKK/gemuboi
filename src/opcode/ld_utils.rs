@@ -18,7 +18,7 @@ pub fn read_byte_from_pc_offset(offset: u16) -> impl Fn(&Cpu) -> mmu::Result<u8>
     move |cpu| {
         let pc = cpu.registers.pc();
 
-        cpu.mmu.read_byte(pc + offset)
+        Ok(cpu.mmu.read_byte(pc + offset))
     }
 }
 
@@ -47,7 +47,7 @@ pub fn load_byte_from_reg_dref(
     move |cpu: &Cpu| {
         let addr = from_reg(&cpu.registers);
 
-        cpu.mmu.read_byte(addr)
+        Ok(cpu.mmu.read_byte(addr))
     }
 }
 

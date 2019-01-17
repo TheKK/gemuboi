@@ -39,25 +39,20 @@ impl PartialEq for Mmu {
 
 impl Mmu {
     #[inline]
-    pub fn read_byte(&self, addr: Addr) -> Result<u8> {
+    pub fn read_byte(&self, addr: Addr) -> u8 {
         let addr = addr as usize;
 
-        self.memory.get(addr).cloned().ok_or(Error::OutOfBound)
+        self.memory.get(addr).cloned().unwrap()
     }
 
     #[inline]
     pub fn read_word(&self, addr: Addr) -> Result<u16> {
         let addr = addr as usize;
 
-        let l = u16::from(self.memory.get(addr).cloned().ok_or(Error::OutOfBound)?);
-        let h = u16::from(
-            self.memory
-                .get(addr + 1)
-                .cloned()
-                .ok_or(Error::OutOfBound)?,
-        );
+        let h = u16::from(*self.memory.get(addr).ok_or(Error::OutOfBound)?);
+        let l = u16::from(*self.memory.get(addr + 1).ok_or(Error::OutOfBound)?);
 
-        Ok((l << 8) + h)
+        Ok((h << 8) + l)
     }
 
     #[inline]
@@ -74,7 +69,6 @@ impl Mmu {
     pub fn write_word(&mut self, addr: Addr, value: u16) -> Result<()> {
         let addr = addr as usize;
 
-        self.memory.get(addr).ok_or(Error::OutOfBound)?;
         self.memory.get(addr + 1).ok_or(Error::OutOfBound)?;
 
         self.memory[addr] = ((value & 0xff00) >> 8) as u8;
@@ -96,7 +90,7 @@ mod test {
             let value = 42;
 
             assert!(mmu.write_byte(addr, value).is_ok());
-            assert_eq!(mmu.read_byte(addr).unwrap(), value);
+            assert_eq!(mmu.read_byte(addr), value);
         };
 
         test(0x00);

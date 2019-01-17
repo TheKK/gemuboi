@@ -64,8 +64,9 @@ pub fn ldh_a_a8_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
     ld(
         cpu,
         &|cpu| {
-            let addr = 0xFF00 + u16::from(read_byte_from_pc_offset(1)(cpu).unwrap());
-            cpu.mmu.read_byte(addr)
+            let addr = 0xFF00 + u16::from(read_byte_from_pc_offset(1)(cpu)?);
+
+            Ok(cpu.mmu.read_byte(addr))
         },
         &store_to_reg(&Registers::set_a),
     );
@@ -79,7 +80,8 @@ pub fn ld_a_a16_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
         cpu,
         &|cpu| {
             let addr = read_word_from_pc_offset(1)(cpu).unwrap();
-            cpu.mmu.read_byte(addr)
+
+            Ok(cpu.mmu.read_byte(addr))
         },
         &store_to_reg(&Registers::set_a),
     );
@@ -93,7 +95,8 @@ pub fn ld_a_c_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
         cpu,
         &|cpu| {
             let addr = 0xFF00 + u16::from(cpu.registers.c());
-            cpu.mmu.read_byte(addr)
+
+            Ok(cpu.mmu.read_byte(addr))
         },
         &store_to_reg(&Registers::set_a),
     );
