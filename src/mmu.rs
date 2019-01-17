@@ -25,7 +25,7 @@ impl Default for Mmu {
 impl fmt::Debug for Mmu {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.debug_struct("Mmu")
-            .field("memoryr", &self.memory.to_vec())
+            .field("memory", &self.memory.to_vec())
             .finish()
     }
 }
