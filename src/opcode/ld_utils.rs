@@ -88,6 +88,17 @@ pub fn store_to_reg_dref(
     }
 }
 
+pub fn store_to_pc_offset_dref(offset: u16) -> impl Fn(&mut Cpu, u8) -> mmu::Result<()> {
+    move |cpu, v| {
+        let pc = cpu.registers.pc();
+
+        let the_addr = cpu.mmu.read_word(pc + offset)?;
+        cpu.mmu.write_byte(the_addr, v)?;
+
+        Ok(())
+    }
+}
+
 #[inline]
 pub fn ld<S>(cpu: &mut Cpu, load_from: &LoadFromFn<S>, store_to: &StoreToFn<S>) {
     load_from(cpu)
