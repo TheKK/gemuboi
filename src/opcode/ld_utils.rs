@@ -1,5 +1,6 @@
 use crate::cpu::Cpu;
 use crate::mmu;
+use crate::opcode::table::{Cycle, OpFn, OpLength};
 use crate::registers::Registers;
 
 pub type LoadFromFn<S> = Fn(&Cpu) -> mmu::Result<S>;
@@ -12,6 +13,20 @@ pub type LoadByteFromRegFn = LoadFromRegFn<u8>;
 pub type StoreByteToRegFn = StoreToRegFn<u8>;
 
 pub type LoadWordFromRegFn = LoadFromRegFn<u16>;
+
+pub fn ldi_instruction(cpu: &mut Cpu, op: &OpFn) -> (Cycle, OpLength) {
+    let result = op(cpu);
+    cpu.registers.set_hl(cpu.registers.hl() + 1);
+
+    result
+}
+
+pub fn ldd_instruction(cpu: &mut Cpu, op: &OpFn) -> (Cycle, OpLength) {
+    let result = op(cpu);
+    cpu.registers.set_hl(cpu.registers.hl() - 1);
+
+    result
+}
 
 #[inline]
 pub fn read_byte_from_pc_offset(offset: u16) -> impl Fn(&Cpu) -> mmu::Result<u8> {
