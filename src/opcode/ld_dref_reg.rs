@@ -2,7 +2,15 @@ use crate::cpu::Cpu;
 use crate::opcode::table::{Cycle, OpLength};
 use crate::registers::Registers;
 
-use super::ld_utils::{ld, load_from_reg, store_to_reg_dref};
+use super::ld_utils::{ld, ldd_instruction, ldi_instruction, load_from_reg, store_to_reg_dref};
+
+pub fn ldi_hl_dref_a(cpu: &mut Cpu) -> (Cycle, OpLength) {
+    ldi_instruction(cpu, &ld_hl_dref_a)
+}
+
+pub fn ldd_hl_dref_a(cpu: &mut Cpu) -> (Cycle, OpLength) {
+    ldd_instruction(cpu, &ld_hl_dref_a)
+}
 
 macro_rules! ld_dref_reg_fn {
     ($fn_name:ident, $addr_reg_getter:ident, $val_reg_getter:ident) => {
@@ -32,6 +40,48 @@ ld_dref_reg_fn!(ld_hl_dref_l, hl, l);
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn run_ldi_hl_dref_a() {
+        // Arrange: prepare cpu.
+        let the_addr = 0x4242;
+        let the_value = 0x42;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_hl(the_addr);
+        actual_cpu.registers.set_a(the_value);
+
+        let mut expected_cpu = actual_cpu.clone();
+        expected_cpu.mmu.write_byte(the_addr, the_value).unwrap();
+        expected_cpu.registers.set_hl(the_addr + 1);
+
+        // Action.cpu
+        ldi_hl_dref_a(&mut actual_cpu);
+
+        // Assert: check cpu state.
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_ldd_hl_dref_a() {
+        // Arrange: prepare cpu.
+        let the_addr = 0x4242;
+        let the_value = 0x42;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_hl(the_addr);
+        actual_cpu.registers.set_a(the_value);
+
+        let mut expected_cpu = actual_cpu.clone();
+        expected_cpu.mmu.write_byte(the_addr, the_value).unwrap();
+        expected_cpu.registers.set_hl(the_addr - 1);
+
+        // Action.cpu
+        ldd_hl_dref_a(&mut actual_cpu);
+
+        // Assert: check cpu state.
+        assert_eq!(actual_cpu, expected_cpu);
+    }
 
     macro_rules! ld_dref_reg_test {
         ($test_name:ident, $ins_to_test:ident, $addr_reg_setter:ident, $val_reg_setter:ident) => {
