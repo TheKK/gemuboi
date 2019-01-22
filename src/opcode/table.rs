@@ -5,7 +5,7 @@ use crate::opcode::ld_reg_d8;
 use crate::opcode::ld_reg_dref;
 use crate::opcode::ld_reg_reg;
 
-type OpFn = &'static Fn(&mut Cpu) -> (Cycle, OpLength);
+pub type OpFn = Fn(&mut Cpu) -> (Cycle, OpLength);
 
 fn unimplement_op_fn(_: &mut Cpu) -> (Cycle, OpLength) {
     unimplemented!("Op code is not implemented yet");
@@ -14,7 +14,7 @@ fn unimplement_op_fn(_: &mut Cpu) -> (Cycle, OpLength) {
 pub struct Cycle(pub u8);
 pub struct OpLength(pub u8);
 
-pub fn op_table(op_code: u8) -> OpFn {
+pub fn op_table(op_code: u8) -> &'static OpFn {
     match op_code {
         0x00 => &control::nop,
 
