@@ -30,8 +30,9 @@ ld_d8_fn!(ld_l_d8, set_l);
 mod test {
     use super::*;
 
-    use crate::opcode::ld_utils::{LoadByteFromRegFn, StoreByteToRegFn};
     use crate::opcode::types::Instruction;
+    use crate::opcode::types::LoadByteFromRegFn;
+    use crate::opcode::types::StoreByteToRegFn;
 
     fn test_ld_d8(
         op_to_test: &Instruction,
