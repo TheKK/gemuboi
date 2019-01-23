@@ -3,7 +3,8 @@ use crate::opcode::table::{Cycle, OpLength};
 use crate::registers::Registers;
 
 use super::ld_utils::{
-    ld, load_byte_from_reg_dref, read_byte_from_pc_offset, read_word_from_pc_offset, store_to_reg,
+    ld, ldd_instruction, ldi_instruction, load_byte_from_reg_dref, read_byte_from_pc_offset,
+    read_word_from_pc_offset, store_to_reg,
 };
 
 macro_rules! ld_reg_dref_fn {
@@ -33,30 +34,12 @@ ld_reg_dref_fn!(ld_l_hl_dref, (hl) > set_l);
 
 #[inline]
 pub fn ldi_a_hl_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
-    ld(
-        cpu,
-        &load_byte_from_reg_dref(&Registers::hl),
-        &store_to_reg(&Registers::set_a),
-    );
-
-    let hl = cpu.registers.hl();
-    cpu.registers.set_hl(hl + 1);
-
-    (Cycle(8), OpLength(1))
+    ldi_instruction(cpu, &ld_a_hl_dref)
 }
 
 #[inline]
 pub fn ldd_a_hl_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
-    ld(
-        cpu,
-        &load_byte_from_reg_dref(&Registers::hl),
-        &store_to_reg(&Registers::set_a),
-    );
-
-    let hl = cpu.registers.hl();
-    cpu.registers.set_hl(hl - 1);
-
-    (Cycle(8), OpLength(1))
+    ldd_instruction(cpu, &ld_a_hl_dref)
 }
 
 #[inline]
