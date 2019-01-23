@@ -105,3 +105,15 @@ pub fn ld<S>(cpu: &mut Cpu, load_from: &LoadFromFn<S>, store_to: &StoreToFn<S>) 
         .and_then(|value| store_to(cpu, value))
         .expect("occur failure while performing ld op code");
 }
+
+pub fn ldi<S>(cpu: &mut Cpu, load_from: &LoadFromFn<S>, store_to: &StoreToFn<S>) {
+    ld(cpu, load_from, store_to);
+
+    cpu.registers.set_hl(cpu.registers.hl() + 1);
+}
+
+pub fn ldd<S>(cpu: &mut Cpu, load_from: &LoadFromFn<S>, store_to: &StoreToFn<S>) {
+    ld(cpu, load_from, store_to);
+
+    cpu.registers.set_hl(cpu.registers.hl() - 1);
+}
