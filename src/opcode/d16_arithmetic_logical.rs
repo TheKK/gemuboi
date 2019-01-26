@@ -4,29 +4,20 @@ use crate::registers::Registers;
 
 use super::arithmetic_logical_utils::inc_d16;
 
-pub fn inc_bc(cpu: &mut Cpu) -> (Cycle, OpLength) {
-    inc_d16(cpu, &Registers::bc, &Registers::set_bc);
+macro_rules! instruction {
+    (inc, $fn_name: ident, $reg_getter:ident, $reg_setter:ident) => {
+        pub fn $fn_name(cpu: &mut Cpu) -> (Cycle, OpLength) {
+            inc_d16(cpu, &Registers::$reg_getter, &Registers::$reg_setter);
 
-    (Cycle(8), OpLength(1))
+            (Cycle(8), OpLength(1))
+        }
+    };
 }
 
-pub fn inc_de(cpu: &mut Cpu) -> (Cycle, OpLength) {
-    inc_d16(cpu, &Registers::de, &Registers::set_de);
-
-    (Cycle(8), OpLength(1))
-}
-
-pub fn inc_hl(cpu: &mut Cpu) -> (Cycle, OpLength) {
-    inc_d16(cpu, &Registers::hl, &Registers::set_hl);
-
-    (Cycle(8), OpLength(1))
-}
-
-pub fn inc_sp(cpu: &mut Cpu) -> (Cycle, OpLength) {
-    inc_d16(cpu, &Registers::sp, &Registers::set_sp);
-
-    (Cycle(8), OpLength(1))
-}
+instruction!(inc, inc_bc, bc, set_bc);
+instruction!(inc, inc_de, de, set_de);
+instruction!(inc, inc_hl, hl, set_hl);
+instruction!(inc, inc_sp, sp, set_sp);
 
 #[cfg(test)]
 mod test {
