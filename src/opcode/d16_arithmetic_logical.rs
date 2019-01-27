@@ -62,6 +62,7 @@ mod test {
     use super::*;
 
     use crate::cpu::Cpu;
+    use crate::opcode::types::{Instruction, StoreWordToRegFn};
 
     macro_rules! test_inc_d16 {
         ($test_name:ident, $op_to_test:ident, $reg_getter:ident, $reg_setter:ident) => {
@@ -110,7 +111,12 @@ mod test {
     test_dec_d16!(run_dec_hl, dec_hl, hl, set_hl);
     test_dec_d16!(run_dec_sp, dec_sp, sp, set_sp);
 
-    fn run_add_hl_bc(with_carry: bool, with_half_carry: bool) {
+    fn run_add_hl(
+        inst_to_test: &Instruction,
+        store_to_reg: &StoreWordToRegFn,
+        with_carry: bool,
+        with_half_carry: bool,
+    ) {
         let init_hl = 0x0101;
 
         let init_value = {
@@ -124,7 +130,9 @@ mod test {
 
         let mut actual_cpu = Cpu::default();
         actual_cpu.registers.set_hl(init_hl);
-        actual_cpu.registers.set_bc(init_value);
+
+        store_to_reg(&mut actual_cpu.registers, init_value);
+
         actual_cpu.registers.flag.set_zero(true);
         actual_cpu.registers.flag.set_sub(true);
         actual_cpu.registers.flag.set_carry(!with_carry);
@@ -141,28 +149,29 @@ mod test {
         // Half carry flag set when carrys from lower 8bits.
         expected_cpu.registers.flag.set_half_carry(with_half_carry);
 
-        add_hl_bc(&mut actual_cpu);
+        inst_to_test(&mut actual_cpu);
 
         assert_eq!(actual_cpu, expected_cpu);
     }
 
-    #[test]
+    // add_hl_bc
     fn run_add_hl_bc_without_carry_without_half_carry() {
-        run_add_hl_bc(false, false);
+        run_add_hl(&add_hl_bc, &Registers::set_bc, false, false);
     }
 
     #[test]
     fn run_add_hl_bc_with_carry_with_half_carry() {
-        run_add_hl_bc(true, true);
+        run_add_hl(&add_hl_bc, &Registers::set_bc, true, true);
     }
 
     #[test]
     fn run_add_hl_bc_with_carry_without_half_carry() {
-        run_add_hl_bc(true, false);
+        run_add_hl(&add_hl_bc, &Registers::set_bc, true, false);
     }
 
     #[test]
     fn run_add_hl_bc_without_carry_with_half_carry() {
-        run_add_hl_bc(false, true);
+        run_add_hl(&add_hl_bc, &Registers::set_bc, false, true);
+    }
     }
 }
