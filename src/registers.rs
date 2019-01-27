@@ -1,63 +1,6 @@
 use std::default::Default;
 
-/// Magic flag
-#[derive(Debug, PartialEq, Clone)]
-pub struct Flag {
-    zero: bool,
-    add_sub: bool,
-    half_carry: bool,
-    carry: bool,
-}
-
-impl Default for Flag {
-    fn default() -> Self {
-        Self {
-            zero: false,
-            add_sub: false,
-            half_carry: false,
-            carry: false,
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct Registers {
-    a: u8,
-
-    b: u8,
-    c: u8,
-    d: u8,
-    e: u8,
-    h: u8,
-    l: u8,
-
-    sp: u16,
-    pc: u16,
-
-    f: Flag,
-}
-
-impl Default for Registers {
-    fn default() -> Self {
-        Registers {
-            a: 0,
-
-            b: 0,
-            c: 0,
-            d: 0,
-            e: 0,
-            h: 0,
-            l: 0,
-
-            sp: 0,
-            pc: 0,
-
-            f: Flag::default(),
-        }
-    }
-}
-
-macro_rules! getter_and_setter {
+macro_rules! register_getter_and_setter {
   (8bits $([$reg:ident, $setter:ident]),*) => {
     $(
       pub fn $reg (&self) -> u8 {
@@ -106,18 +49,84 @@ macro_rules! flag_getter_and_setter {
   ($([$flag:ident, $setter:ident]),*) => {
     $(
       pub fn $flag (&self) -> bool {
-        self.f.$flag
+        self.$flag
       }
 
       pub fn $setter (&mut self, val: bool) {
-        self.f.$flag = val;
+        self.$flag = val;
       }
     )*
   };
 }
 
+/// Magic flag
+#[derive(Debug, PartialEq, Clone)]
+pub struct Flag {
+    zero: bool,
+    sub: bool,
+    half_carry: bool,
+    carry: bool,
+}
+
+impl Default for Flag {
+    fn default() -> Self {
+        Self {
+            zero: false,
+            sub: false,
+            half_carry: false,
+            carry: false,
+        }
+    }
+}
+
+impl Flag {
+    flag_getter_and_setter![
+        [zero, set_zero],
+        [sub, set_sub],
+        [half_carry, set_half_carry],
+        [carry, set_carry]
+    ];
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct Registers {
+    a: u8,
+
+    b: u8,
+    c: u8,
+    d: u8,
+    e: u8,
+    h: u8,
+    l: u8,
+
+    sp: u16,
+    pc: u16,
+
+    pub f: Flag,
+}
+
+impl Default for Registers {
+    fn default() -> Self {
+        Registers {
+            a: 0,
+
+            b: 0,
+            c: 0,
+            d: 0,
+            e: 0,
+            h: 0,
+            l: 0,
+
+            sp: 0,
+            pc: 0,
+
+            f: Flag::default(),
+        }
+    }
+}
+
 impl Registers {
-    getter_and_setter![
+    register_getter_and_setter![
     8bits
     [a, set_a],
     [b, set_b],
@@ -128,25 +137,18 @@ impl Registers {
     [l, set_l]
   ];
 
-    getter_and_setter![
+    register_getter_and_setter![
     16bits
     [sp, set_sp],
     [pc, set_pc]
   ];
 
-    getter_and_setter![
+    register_getter_and_setter![
     16bits
     [b + c, bc, set_bc],
     [d + e, de, set_de],
     [h + l, hl, set_hl]
   ];
-
-    flag_getter_and_setter![
-        [zero, set_zero],
-        [add_sub, set_add_sub],
-        [half_carry, set_half_carry],
-        [carry, set_carry]
-    ];
 }
 
 #[cfg(test)]
