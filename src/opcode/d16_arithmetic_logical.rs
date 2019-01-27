@@ -163,6 +163,7 @@ mod test {
     }
 
     // add_hl_bc
+    #[test]
     fn run_add_hl_bc_without_carry_without_half_carry() {
         run_add_hl(&add_hl_bc, &Registers::set_bc, false, false);
     }
@@ -183,6 +184,7 @@ mod test {
     }
 
     // add_hl_de
+    #[test]
     fn run_add_hl_de_without_carry_without_half_carry() {
         run_add_hl(&add_hl_de, &Registers::set_de, false, false);
     }
@@ -204,6 +206,7 @@ mod test {
 
 
     // add_hl_sp
+    #[test]
     fn run_add_hl_sp_without_carry_without_half_carry() {
         run_add_hl(&add_hl_sp, &Registers::set_sp, false, false);
     }
