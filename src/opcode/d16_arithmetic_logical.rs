@@ -61,6 +61,10 @@ pub fn add_hl_de(cpu: &mut Cpu) -> (Cycle, OpLength) {
     add_hl(cpu, &Registers::de)
 }
 
+pub fn add_hl_hl(cpu: &mut Cpu) -> (Cycle, OpLength) {
+    add_hl(cpu, &Registers::hl)
+}
+
 pub fn add_hl_sp(cpu: &mut Cpu) -> (Cycle, OpLength) {
     add_hl(cpu, &Registers::sp)
 }
@@ -162,6 +166,39 @@ mod test {
         assert_eq!(actual_cpu, expected_cpu);
     }
 
+    fn run_add_hl_hl(with_carry: bool, with_half_carry: bool) {
+        let init_hl = {
+            let high_init_value = if with_carry { 0xFF00 } else { 0x1100 };
+            let low_init_value = if with_half_carry { 0x00FF } else { 0x0011 };
+
+            high_init_value + low_init_value
+        };
+
+        let result_hl = u16::wrapping_add(init_hl, init_hl);
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_hl(init_hl);
+        actual_cpu.registers.flag.set_zero(true);
+        actual_cpu.registers.flag.set_sub(true);
+        actual_cpu.registers.flag.set_carry(!with_carry);
+        actual_cpu.registers.flag.set_half_carry(!with_half_carry);
+
+        let mut expected_cpu = actual_cpu.clone();
+        expected_cpu.registers.set_hl(result_hl);
+        // Zero flag remain the same.
+        expected_cpu.registers.flag.set_zero(true);
+        // Sub flag reset.
+        expected_cpu.registers.flag.set_sub(false);
+        // Carry flag set when carrys from 16bits.
+        expected_cpu.registers.flag.set_carry(with_carry);
+        // Half carry flag set when carrys from lower 8bits.
+        expected_cpu.registers.flag.set_half_carry(with_half_carry);
+
+        add_hl_hl(&mut actual_cpu);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
     // add_hl_bc
     #[test]
     fn run_add_hl_bc_without_carry_without_half_carry() {
@@ -204,6 +241,26 @@ mod test {
         run_add_hl(&add_hl_de, &Registers::set_de, false, true);
     }
 
+    // add_hl_hl
+    #[test]
+    fn run_add_hl_hl_without_carry_without_half_carry() {
+        run_add_hl_hl(false, false);
+    }
+
+    #[test]
+    fn run_add_hl_hl_with_carry_with_half_carry() {
+        run_add_hl_hl(true, true);
+    }
+
+    #[test]
+    fn run_add_hl_hl_with_carry_without_half_carry() {
+        run_add_hl_hl(true, false);
+    }
+
+    #[test]
+    fn run_add_hl_hl_without_carry_with_half_carry() {
+        run_add_hl_hl(false, true);
+    }
 
     // add_hl_sp
     #[test]
