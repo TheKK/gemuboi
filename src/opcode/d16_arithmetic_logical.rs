@@ -57,6 +57,14 @@ pub fn add_hl_bc(cpu: &mut Cpu) -> (Cycle, OpLength) {
     add_hl(cpu, &Registers::bc)
 }
 
+pub fn add_hl_de(cpu: &mut Cpu) -> (Cycle, OpLength) {
+    add_hl(cpu, &Registers::de)
+}
+
+pub fn add_hl_sp(cpu: &mut Cpu) -> (Cycle, OpLength) {
+    add_hl(cpu, &Registers::sp)
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -173,5 +181,45 @@ mod test {
     fn run_add_hl_bc_without_carry_with_half_carry() {
         run_add_hl(&add_hl_bc, &Registers::set_bc, false, true);
     }
+
+    // add_hl_de
+    fn run_add_hl_de_without_carry_without_half_carry() {
+        run_add_hl(&add_hl_de, &Registers::set_de, false, false);
+    }
+
+    #[test]
+    fn run_add_hl_de_with_carry_with_half_carry() {
+        run_add_hl(&add_hl_de, &Registers::set_de, true, true);
+    }
+
+    #[test]
+    fn run_add_hl_de_with_carry_without_half_carry() {
+        run_add_hl(&add_hl_de, &Registers::set_de, true, false);
+    }
+
+    #[test]
+    fn run_add_hl_de_without_carry_with_half_carry() {
+        run_add_hl(&add_hl_de, &Registers::set_de, false, true);
+    }
+
+
+    // add_hl_sp
+    fn run_add_hl_sp_without_carry_without_half_carry() {
+        run_add_hl(&add_hl_sp, &Registers::set_sp, false, false);
+    }
+
+    #[test]
+    fn run_add_hl_sp_with_carry_with_half_carry() {
+        run_add_hl(&add_hl_sp, &Registers::set_sp, true, true);
+    }
+
+    #[test]
+    fn run_add_hl_sp_with_carry_without_half_carry() {
+        run_add_hl(&add_hl_sp, &Registers::set_sp, true, false);
+    }
+
+    #[test]
+    fn run_add_hl_sp_without_carry_with_half_carry() {
+        run_add_hl(&add_hl_sp, &Registers::set_sp, false, true);
     }
 }

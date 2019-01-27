@@ -134,6 +134,8 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x3B => &d16_arithmetic_logical::dec_sp,
 
         0x09 => &d16_arithmetic_logical::add_hl_bc,
+        0x19 => &d16_arithmetic_logical::add_hl_de,
+        0x39 => &d16_arithmetic_logical::add_hl_sp,
 
         _ => &unimplement_op_fn,
     }
