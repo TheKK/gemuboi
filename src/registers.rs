@@ -102,7 +102,7 @@ pub struct Registers {
     sp: u16,
     pc: u16,
 
-    pub f: Flag,
+    pub flag: Flag,
 }
 
 impl Default for Registers {
@@ -120,7 +120,7 @@ impl Default for Registers {
             sp: 0,
             pc: 0,
 
-            f: Flag::default(),
+            flag: Flag::default(),
         }
     }
 }
