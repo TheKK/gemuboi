@@ -103,8 +103,8 @@ mod test {
 
         let mut actual_cpu = Cpu::default();
         actual_cpu.registers.set_pc(0);
-        actual_cpu.mmu.write_byte(0, 0xEA);
-        actual_cpu.mmu.write_word(1, the_addr);
+        actual_cpu.mmu.write_byte(0, 0xEA).unwrap();
+        actual_cpu.mmu.write_word(1, the_addr).unwrap();
         actual_cpu.registers.set_a(the_value);
 
         let mut expected_cpu = actual_cpu.clone();
