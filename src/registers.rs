@@ -28,18 +28,18 @@ macro_rules! register_getter_and_setter {
   (16bits $([$regL:ident + $regH:ident, $getter:ident, $setter:ident]),*) => {
     $(
       pub fn $getter (&self) -> u16 {
-        let l = u16::from(self.$regL) << 8;
-        let h = u16::from(self.$regH) << 0;
+        let h = u16::from(self.$regH) << 8;
+        let l = u16::from(self.$regL) << 0;
 
-        l + h
+        h + l
       }
 
       pub fn $setter(&mut self, val: u16) {
-        let l = ((val & 0xff00) >> 8) as u8;
-        let h = ((val & 0x00ff) >> 0) as u8;
+        let h = ((val & 0xFF00) >> 8) as u8;
+        let l = ((val & 0x00FF) >> 0) as u8;
 
-        self.$regL = l;
         self.$regH = h;
+        self.$regL = l;
       }
     )*
   };
@@ -167,13 +167,13 @@ mod test {
     ) {
         let mut registers = Registers::default();
 
-        let l = 0x1200;
-        let h = 0x0023;
+        let h = 0x1200;
+        let l = 0x0023;
 
-        set_fn(&mut registers, l + h);
+        set_fn(&mut registers, h + l);
 
-        assert_eq!(get_l_fn(&registers), (l >> 8) as u8);
-        assert_eq!(get_h_fn(&registers), (h >> 0) as u8);
+        assert_eq!(get_h_fn(&registers), (h >> 8) as u8);
+        assert_eq!(get_l_fn(&registers), (l >> 0) as u8);
     }
 
     fn test_u16_write(
@@ -183,13 +183,13 @@ mod test {
     ) {
         let mut registers = Registers::default();
 
-        let l = 0x12;
-        let h = 0x23;
+        let h = 0x12;
+        let l = 0x23;
 
-        l_set_fn(&mut registers, l);
         h_set_fn(&mut registers, h);
+        l_set_fn(&mut registers, l);
 
-        let sum = ((l as u16) << 8) + h as u16;
+        let sum = ((h as u16) << 8) + l as u16;
 
         assert_eq!(get_fn(&registers), sum);
     }
