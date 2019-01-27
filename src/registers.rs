@@ -25,7 +25,7 @@ macro_rules! register_getter_and_setter {
     )*
   };
 
-  (16bits $([$regL:ident + $regH:ident, $getter:ident, $setter:ident]),*) => {
+  (16bits $([$regH:ident + $regL:ident, $getter:ident, $setter:ident]),*) => {
     $(
       pub fn $getter (&self) -> u16 {
         let h = u16::from(self.$regH) << 8;
@@ -162,8 +162,8 @@ mod test {
 
     fn test_u16_read(
         set_fn: RegisterSetter16,
-        get_l_fn: RegisterGetter8,
         get_h_fn: RegisterGetter8,
+        get_l_fn: RegisterGetter8,
     ) {
         let mut registers = Registers::default();
 
@@ -177,8 +177,8 @@ mod test {
     }
 
     fn test_u16_write(
-        l_set_fn: RegisterSetter8,
         h_set_fn: RegisterSetter8,
+        l_set_fn: RegisterSetter8,
         get_fn: RegisterGetter16,
     ) {
         let mut registers = Registers::default();
