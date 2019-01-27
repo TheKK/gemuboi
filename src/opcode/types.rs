@@ -3,7 +3,8 @@ use crate::mmu;
 use crate::opcode::table::{Cycle, OpLength};
 use crate::registers::Registers;
 
-pub type Instruction = Fn(&mut Cpu) -> (Cycle, OpLength);
+pub type InstructionResult = (Cycle, OpLength);
+pub type Instruction = Fn(&mut Cpu) -> InstructionResult;
 
 pub type LoadFromFn<S> = Fn(&Cpu) -> mmu::Result<S>;
 pub type StoreToFn<S> = Fn(&mut Cpu, S) -> mmu::Result<()>;
