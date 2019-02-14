@@ -30,11 +30,16 @@ macro_rules! add_a_instruction {
     };
 }
 
+add_a_instruction!(add_a_a, a);
 add_a_instruction!(add_a_b, b);
+add_a_instruction!(add_a_c, c);
+add_a_instruction!(add_a_d, d);
+add_a_instruction!(add_a_e, e);
+add_a_instruction!(add_a_h, h);
+add_a_instruction!(add_a_l, l);
 
 #[cfg(test)]
 mod tests {
-
     macro_rules! test_add_a_instruction {
         ($inst_name: ident, $reg_setter: ident) => {
             mod $inst_name {
@@ -124,5 +129,11 @@ mod tests {
         };
     }
 
+    test_add_a_instruction!(add_a_a, set_a);
     test_add_a_instruction!(add_a_b, set_b);
+    test_add_a_instruction!(add_a_c, set_c);
+    test_add_a_instruction!(add_a_d, set_d);
+    test_add_a_instruction!(add_a_e, set_e);
+    test_add_a_instruction!(add_a_h, set_h);
+    test_add_a_instruction!(add_a_l, set_l);
 }
