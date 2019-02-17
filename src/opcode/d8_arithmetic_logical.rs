@@ -274,7 +274,7 @@ mod tests {
                     expected_cpu.registers.flag.set_carry(expected_carry);
                     expected_cpu.registers.flag.set_half_carry(with_half_carry);
 
-                    sub_b(&mut actual_cpu);
+                    $inst_name(&mut actual_cpu);
 
                     assert_eq!(actual_cpu, expected_cpu);
                 }
