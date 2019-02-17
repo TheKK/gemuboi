@@ -1,13 +1,7 @@
+use crate::carry_test::{CarryTest, CarryTestResult};
 use crate::cpu::Cpu;
 use crate::opcode::table::{Cycle, OpLength};
 use crate::opcode::types::InstructionResult;
-
-fn carry_add_u8(l: u8, r: u8) -> (u8, bool, bool) {
-    let (val, carry) = l.overflowing_add(r);
-    let half_carry = (val & (1 << 3)) < (l & (1 << 3));
-
-    (val, half_carry, carry)
-}
 
 macro_rules! add_a_instruction {
     ($ins_name: ident, $from: ident) => {
@@ -16,7 +10,11 @@ macro_rules! add_a_instruction {
             let a = cpu.registers.a();
             let val = cpu.registers.$from();
 
-            let (result, half_carry, carry) = carry_add_u8(a, val);
+            let CarryTestResult {
+                val: result,
+                half_carry,
+                carry,
+            } = a.carry_add(val);
 
             cpu.registers.set_a(result);
 
