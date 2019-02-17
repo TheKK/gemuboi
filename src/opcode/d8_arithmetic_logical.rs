@@ -63,6 +63,12 @@ macro_rules! sub_reg_instruction {
 }
 
 sub_reg_instruction!(sub_b, b);
+sub_reg_instruction!(sub_c, c);
+sub_reg_instruction!(sub_d, d);
+sub_reg_instruction!(sub_e, e);
+sub_reg_instruction!(sub_h, h);
+sub_reg_instruction!(sub_l, l);
+sub_reg_instruction!(sub_a, a);
 
 #[cfg(test)]
 mod tests {
@@ -293,4 +299,51 @@ mod tests {
     }
 
     test_sub_reg_instruction!(sub_b, set_b);
+    test_sub_reg_instruction!(sub_c, set_c);
+    test_sub_reg_instruction!(sub_d, set_d);
+    test_sub_reg_instruction!(sub_e, set_e);
+    test_sub_reg_instruction!(sub_h, set_h);
+    test_sub_reg_instruction!(sub_l, set_l);
+
+    mod sub_a {
+        use super::super::*;
+
+        use crate::cpu::Cpu;
+
+        #[test]
+        fn run() {
+            let init_a = 42;
+
+            let expected_result = init_a - init_a;
+
+            let expected_zero = true;
+            let expected_sub = true;
+            let expected_half_carry = false;
+            let expected_carry = false;
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.set_a(init_a);
+            actual_cpu.registers.flag.set_zero(!expected_zero);
+            actual_cpu.registers.flag.set_sub(!expected_sub);
+            actual_cpu
+                .registers
+                .flag
+                .set_half_carry(!expected_half_carry);
+            actual_cpu.registers.flag.set_carry(!expected_carry);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.set_a(expected_result);
+            expected_cpu.registers.flag.set_zero(expected_zero);
+            expected_cpu.registers.flag.set_sub(expected_sub);
+            expected_cpu
+                .registers
+                .flag
+                .set_half_carry(expected_half_carry);
+            expected_cpu.registers.flag.set_carry(expected_carry);
+
+            sub_a(&mut actual_cpu);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+    }
 }
