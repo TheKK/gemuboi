@@ -9,6 +9,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub type Addr = u16;
 
 pub const MEM_SIZE: u16 = 0xFFFF;
+pub const INVALID_READ_DEFAULT_VALUE: u8 = 0;
 
 #[derive(Clone)]
 pub struct Mmu {
@@ -42,7 +43,10 @@ impl Mmu {
     pub fn read_byte(&self, addr: Addr) -> u8 {
         let addr = addr as usize;
 
-        self.memory.get(addr).cloned().unwrap()
+        self.memory
+            .get(addr)
+            .cloned()
+            .unwrap_or(INVALID_READ_DEFAULT_VALUE)
     }
 
     #[inline]
@@ -81,6 +85,13 @@ impl Mmu {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn read_byte_with_incorrect_address() {
+        let mmu = Mmu::default();
+
+        assert_eq!(mmu.read_byte(0xFF), INVALID_READ_DEFAULT_VALUE);
+    }
 
     #[test]
     fn write_byte_with_correct_address() {
