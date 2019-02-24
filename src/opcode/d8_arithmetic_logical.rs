@@ -147,13 +147,13 @@ macro_rules! sub_reg_instruction {
     };
 }
 
-sub_reg_instruction!(sub_b, b);
-sub_reg_instruction!(sub_c, c);
-sub_reg_instruction!(sub_d, d);
-sub_reg_instruction!(sub_e, e);
-sub_reg_instruction!(sub_h, h);
-sub_reg_instruction!(sub_l, l);
-sub_reg_instruction!(sub_a, a);
+sub_reg_instruction!(sub_a_b, b);
+sub_reg_instruction!(sub_a_c, c);
+sub_reg_instruction!(sub_a_d, d);
+sub_reg_instruction!(sub_a_e, e);
+sub_reg_instruction!(sub_a_h, h);
+sub_reg_instruction!(sub_a_l, l);
+sub_reg_instruction!(sub_a_a, a);
 
 // SBC REG
 // 1  4
@@ -527,12 +527,12 @@ mod tests {
         };
     }
 
-    test_sub_reg_instruction!(sub_b, set_b);
-    test_sub_reg_instruction!(sub_c, set_c);
-    test_sub_reg_instruction!(sub_d, set_d);
-    test_sub_reg_instruction!(sub_e, set_e);
-    test_sub_reg_instruction!(sub_h, set_h);
-    test_sub_reg_instruction!(sub_l, set_l);
+    test_sub_reg_instruction!(sub_a_b, set_b);
+    test_sub_reg_instruction!(sub_a_c, set_c);
+    test_sub_reg_instruction!(sub_a_d, set_d);
+    test_sub_reg_instruction!(sub_a_e, set_e);
+    test_sub_reg_instruction!(sub_a_h, set_h);
+    test_sub_reg_instruction!(sub_a_l, set_l);
 
     mod sub_a {
         use super::super::*;
@@ -570,7 +570,7 @@ mod tests {
                 .set_half_carry(expected_half_carry);
             expected_cpu.registers.flag.set_carry(expected_carry);
 
-            sub_a(&mut actual_cpu);
+            sub_a_a(&mut actual_cpu);
 
             assert_eq!(actual_cpu, expected_cpu);
         }
