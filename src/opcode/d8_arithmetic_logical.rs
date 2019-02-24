@@ -155,6 +155,26 @@ sub_reg_instruction!(sub_h, h);
 sub_reg_instruction!(sub_l, l);
 sub_reg_instruction!(sub_a, a);
 
+// SBC REG
+// 1  4
+macro_rules! sbc_reg_instruction {
+    ($ins_name: ident, $from: ident) => {
+        pub fn $ins_name(cpu: &mut Cpu) -> InstructionResult {
+            sbc(cpu, cpu.registers.$from());
+
+            (Cycle(4), OpLength(1))
+        }
+    };
+}
+
+sbc_reg_instruction!(sbc_a_b, b);
+sbc_reg_instruction!(sbc_a_c, c);
+sbc_reg_instruction!(sbc_a_d, d);
+sbc_reg_instruction!(sbc_a_e, e);
+sbc_reg_instruction!(sbc_a_h, h);
+sbc_reg_instruction!(sbc_a_l, l);
+sbc_reg_instruction!(sbc_a_a, a);
+
 #[cfg(test)]
 mod tests {
     macro_rules! test_add_a_instruction {
