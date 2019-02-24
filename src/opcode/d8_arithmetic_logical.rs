@@ -303,6 +303,42 @@ pub fn and_d8(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(8), OpLength(2))
 }
 
+// OR REG
+// 1  4
+macro_rules! or_reg_instruction {
+    ($ins_name: ident, $from: ident) => {
+        pub fn $ins_name(cpu: &mut Cpu) -> InstructionResult {
+            or(cpu, cpu.registers.$from());
+
+            (Cycle(4), OpLength(1))
+        }
+    };
+}
+
+or_reg_instruction!(or_b, b);
+or_reg_instruction!(or_c, c);
+or_reg_instruction!(or_d, d);
+or_reg_instruction!(or_e, e);
+or_reg_instruction!(or_h, h);
+or_reg_instruction!(or_l, l);
+or_reg_instruction!(or_a, a);
+
+// OR (HL)
+// 1  8
+pub fn or_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    or(cpu, cpu.read_hl_dref());
+
+    (Cycle(8), OpLength(1))
+}
+
+// OR d8
+// 2  8
+pub fn or_d8(cpu: &mut Cpu) -> InstructionResult {
+    or(cpu, cpu.read_byte_argument(1));
+
+    (Cycle(8), OpLength(2))
+}
+
 #[cfg(test)]
 mod tests {
     mod add_a {
