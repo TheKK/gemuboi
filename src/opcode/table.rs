@@ -202,6 +202,16 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x9F => &d8_arithmetic_logical::sbc_a_a,
         0xDE => &d8_arithmetic_logical::sbc_a_d8,
 
+        0xA8 => &d8_arithmetic_logical::xor_b,
+        0xA9 => &d8_arithmetic_logical::xor_c,
+        0xAA => &d8_arithmetic_logical::xor_d,
+        0xAB => &d8_arithmetic_logical::xor_e,
+        0xAC => &d8_arithmetic_logical::xor_h,
+        0xAD => &d8_arithmetic_logical::xor_l,
+        0xAE => &d8_arithmetic_logical::xor_hl_dref,
+        0xAF => &d8_arithmetic_logical::xor_a,
+        0xEE => &d8_arithmetic_logical::xor_d8,
+
         _ => &unimplement_op_fn,
     }
 }

@@ -317,6 +317,42 @@ pub fn and_d8(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(8), OpLength(2))
 }
 
+// XOR REG
+// 1  4
+macro_rules! xor_reg_instruction {
+    ($ins_name: ident, $from: ident) => {
+        pub fn $ins_name(cpu: &mut Cpu) -> InstructionResult {
+            xor(cpu, cpu.registers.$from());
+
+            (Cycle(4), OpLength(1))
+        }
+    };
+}
+
+xor_reg_instruction!(xor_b, b);
+xor_reg_instruction!(xor_c, c);
+xor_reg_instruction!(xor_d, d);
+xor_reg_instruction!(xor_e, e);
+xor_reg_instruction!(xor_h, h);
+xor_reg_instruction!(xor_l, l);
+xor_reg_instruction!(xor_a, a);
+
+// XOR (HL)
+// 1  8
+pub fn xor_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    xor(cpu, cpu.read_hl_dref());
+
+    (Cycle(8), OpLength(1))
+}
+
+// XOR d8
+// 2  8
+pub fn xor_d8(cpu: &mut Cpu) -> InstructionResult {
+    xor(cpu, cpu.read_byte_argument(1));
+
+    (Cycle(8), OpLength(2))
+}
+
 // OR REG
 // 1  4
 macro_rules! or_reg_instruction {
