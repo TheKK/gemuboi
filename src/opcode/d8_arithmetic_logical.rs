@@ -123,6 +123,14 @@ pub fn add_a_hl_dref(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(8), OpLength(1))
 }
 
+// ADD A,d8
+// 2  8
+pub fn add_a_d8(cpu: &mut Cpu) -> InstructionResult {
+    add(cpu, cpu.read_byte_argument(1));
+
+    (Cycle(8), OpLength(2))
+}
+
 // ADC A REG
 // 1  4
 macro_rules! adc_a_instruction {
@@ -149,6 +157,14 @@ pub fn adc_a_hl_dref(cpu: &mut Cpu) -> InstructionResult {
     adc(cpu, cpu.read_hl_dref());
 
     (Cycle(8), OpLength(1))
+}
+
+// ADC A,d8
+// 2  8
+pub fn adc_a_d8(cpu: &mut Cpu) -> InstructionResult {
+    adc(cpu, cpu.read_byte_argument(1));
+
+    (Cycle(8), OpLength(2))
 }
 
 // SUB REG
@@ -179,6 +195,14 @@ pub fn sub_hl_dref(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(8), OpLength(1))
 }
 
+// SUB d8
+// 2  8
+pub fn sub_d8(cpu: &mut Cpu) -> InstructionResult {
+    sub(cpu, cpu.read_byte_argument(1));
+
+    (Cycle(8), OpLength(2))
+}
+
 // SBC REG
 // 1  4
 macro_rules! sbc_reg_instruction {
@@ -205,6 +229,14 @@ pub fn sbc_a_hl_dref(cpu: &mut Cpu) -> InstructionResult {
     sbc(cpu, cpu.read_hl_dref());
 
     (Cycle(8), OpLength(1))
+}
+
+// SBC A,d8
+// 2  8
+pub fn sbc_a_d8(cpu: &mut Cpu) -> InstructionResult {
+    sbc(cpu, cpu.read_byte_argument(1));
+
+    (Cycle(8), OpLength(2))
 }
 
 #[cfg(test)]
