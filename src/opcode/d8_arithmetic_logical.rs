@@ -253,6 +253,42 @@ pub fn sbc_a_d8(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(8), OpLength(2))
 }
 
+// AND REG
+// 1  4
+macro_rules! and_reg_instruction {
+    ($ins_name: ident, $from: ident) => {
+        pub fn $ins_name(cpu: &mut Cpu) -> InstructionResult {
+            and(cpu, cpu.registers.$from());
+
+            (Cycle(4), OpLength(1))
+        }
+    };
+}
+
+and_reg_instruction!(and_b, b);
+and_reg_instruction!(and_c, c);
+and_reg_instruction!(and_d, d);
+and_reg_instruction!(and_e, e);
+and_reg_instruction!(and_h, h);
+and_reg_instruction!(and_l, l);
+and_reg_instruction!(and_a, a);
+
+// AND A,(HL)
+// 1  8
+pub fn and_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    and(cpu, cpu.read_hl_dref());
+
+    (Cycle(8), OpLength(1))
+}
+
+// AND A,d8
+// 2  8
+pub fn and_d8(cpu: &mut Cpu) -> InstructionResult {
+    and(cpu, cpu.read_byte_argument(1));
+
+    (Cycle(8), OpLength(2))
+}
+
 #[cfg(test)]
 mod tests {
     mod add_a {
