@@ -169,7 +169,6 @@ fn inc(cpu: &mut Cpu) {
     cpu.registers.flag.set_zero(result == 0);
     cpu.registers.flag.set_sub(false);
     cpu.registers.flag.set_half_carry(half_carry);
-    cpu.registers.flag.set_carry(false);
 }
 macro_rules! add_a_instruction {
     ($ins_name: ident, $from: ident) => {
