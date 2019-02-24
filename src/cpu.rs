@@ -15,6 +15,12 @@ impl Cpu {
         cycle
     }
 
+    pub fn read_hl_dref(&self) -> u8 {
+        let hl = self.registers.hl();
+
+        self.mmu.read_byte(hl)
+    }
+
     pub fn read_byte_argument(&self, index: u16) -> u8 {
         let arg_addr = self.registers.pc().saturating_add(index);
 
@@ -25,6 +31,34 @@ impl Cpu {
 #[cfg(test)]
 mod test {
     use super::Cpu;
+
+    mod read_hl_dref {
+        use super::super::Cpu;
+
+        #[test]
+        fn normal_run() {
+            let hl = 0x4242;
+            let the_value = 0x44;
+
+            let mut cpu = Cpu::default();
+            cpu.registers.set_hl(hl);
+            cpu.mmu.write_byte(hl, the_value).expect("write error");
+
+            assert_eq!(cpu.read_hl_dref(), the_value);
+        }
+
+        #[test]
+        fn run_with_out_of_bound_address() {
+            use crate::mmu::INVALID_READ_DEFAULT_VALUE;
+
+            let hl = 0xFFFF;
+
+            let mut cpu = Cpu::default();
+            cpu.registers.set_hl(hl);
+
+            assert_eq!(cpu.read_hl_dref(), INVALID_READ_DEFAULT_VALUE);
+        }
+    }
 
     #[test]
     fn read_byte_argument_normal() {
