@@ -287,7 +287,7 @@ and_reg_instruction!(and_h, h);
 and_reg_instruction!(and_l, l);
 and_reg_instruction!(and_a, a);
 
-// AND A,(HL)
+// AND (HL)
 // 1  8
 pub fn and_hl_dref(cpu: &mut Cpu) -> InstructionResult {
     and(cpu, cpu.read_hl_dref());
@@ -295,7 +295,7 @@ pub fn and_hl_dref(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(8), OpLength(1))
 }
 
-// AND A,d8
+// AND d8
 // 2  8
 pub fn and_d8(cpu: &mut Cpu) -> InstructionResult {
     and(cpu, cpu.read_byte_argument(1));
