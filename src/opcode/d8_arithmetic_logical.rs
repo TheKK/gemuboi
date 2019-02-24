@@ -124,6 +124,22 @@ fn xor(cpu: &mut Cpu, val: u8) {
     cpu.registers.flag.set_carry(false);
 }
 
+// Z 1 H C
+fn cp(cpu: &mut Cpu, val: u8) {
+    let a = cpu.registers.a();
+
+    let CarryTestResult {
+        val: result,
+        half_carry,
+        carry,
+    } = a.carry_sub(val);
+
+    cpu.registers.flag.set_zero(result == 0);
+    cpu.registers.flag.set_sub(true);
+    cpu.registers.flag.set_half_carry(half_carry);
+    cpu.registers.flag.set_carry(carry);
+}
+
 // Z 0 0 0
 fn or(cpu: &mut Cpu, val: u8) {
     let a = cpu.registers.a();
@@ -1469,6 +1485,121 @@ mod tests {
             xor(&mut actual_cpu, val);
 
             assert_eq!(actual_cpu, expected_cpu);
+        }
+    }
+
+    mod cp {
+        use super::super::cp;
+
+        use crate::cpu::Cpu;
+
+        fn run_with_non_zero_result_or_not(is_zero: bool) {
+            let init_a = 42;
+            let val = if is_zero { 42 } else { 10 };
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.set_a(init_a);
+            actual_cpu.registers.flag.set_zero(!is_zero);
+            actual_cpu.registers.flag.set_sub(false);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.flag.set_zero(is_zero);
+            expected_cpu.registers.flag.set_sub(true);
+
+            cp(&mut actual_cpu, val);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+
+        #[test]
+        fn run_with_zero_result() {
+            run_with_non_zero_result_or_not(true);
+        }
+
+        #[test]
+        fn run_with_non_zero_result() {
+            run_with_non_zero_result_or_not(false);
+        }
+
+        fn run_with_carry_or_not(with_carry: bool) {
+            let init_a = 0b00010000_u8;
+            let val = if with_carry { 0b11110000 } else { 0b00000000 };
+
+            let expected_zero = false;
+            let expected_half_carry = false;
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.set_a(init_a);
+            actual_cpu.registers.flag.set_zero(!expected_zero);
+            actual_cpu.registers.flag.set_sub(false);
+            actual_cpu
+                .registers
+                .flag
+                .set_half_carry(!expected_half_carry);
+            actual_cpu.registers.flag.set_carry(!with_carry);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.flag.set_zero(expected_zero);
+            expected_cpu.registers.flag.set_sub(true);
+            expected_cpu
+                .registers
+                .flag
+                .set_half_carry(expected_half_carry);
+            expected_cpu.registers.flag.set_carry(with_carry);
+
+            cp(&mut actual_cpu, val);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+
+        #[test]
+        fn run_with_carry() {
+            run_with_carry_or_not(true);
+        }
+
+        #[test]
+        fn run_without_carry() {
+            run_with_carry_or_not(false);
+        }
+
+        fn run_with_half_carry_or_not(with_half_carry: bool) {
+            let init_a = 0b11110001_u8;
+            let val = if with_half_carry {
+                0b00001111
+            } else {
+                0b00000000
+            };
+
+            let expected_zero = false;
+
+            let expected_carry = false;
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.set_a(init_a);
+            actual_cpu.registers.flag.set_zero(!expected_zero);
+            actual_cpu.registers.flag.set_sub(false);
+            actual_cpu.registers.flag.set_carry(!expected_carry);
+            actual_cpu.registers.flag.set_half_carry(!with_half_carry);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.flag.set_zero(expected_zero);
+            expected_cpu.registers.flag.set_sub(true);
+            expected_cpu.registers.flag.set_carry(expected_carry);
+            expected_cpu.registers.flag.set_half_carry(with_half_carry);
+
+            cp(&mut actual_cpu, val);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+
+        #[test]
+        fn run_with_half_carry() {
+            run_with_half_carry_or_not(true);
+        }
+
+        #[test]
+        fn run_without_half_carry() {
+            run_with_half_carry_or_not(false);
         }
     }
 }
