@@ -148,6 +148,7 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x83 => &d8_arithmetic_logical::add_a_e,
         0x84 => &d8_arithmetic_logical::add_a_h,
         0x85 => &d8_arithmetic_logical::add_a_l,
+        0x86 => &d8_arithmetic_logical::add_a_hl_dref,
         0x87 => &d8_arithmetic_logical::add_a_a,
 
         0x90 => &d8_arithmetic_logical::sub_a_b,
@@ -156,6 +157,7 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x93 => &d8_arithmetic_logical::sub_a_e,
         0x94 => &d8_arithmetic_logical::sub_a_h,
         0x95 => &d8_arithmetic_logical::sub_a_l,
+        0x96 => &d8_arithmetic_logical::sub_hl_dref,
         0x97 => &d8_arithmetic_logical::sub_a_a,
 
         0x88 => &d8_arithmetic_logical::adc_a_b,
@@ -164,6 +166,7 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x8B => &d8_arithmetic_logical::adc_a_e,
         0x8C => &d8_arithmetic_logical::adc_a_h,
         0x8D => &d8_arithmetic_logical::adc_a_l,
+        0x8E => &d8_arithmetic_logical::adc_a_hl_dref,
         0x8F => &d8_arithmetic_logical::adc_a_a,
 
         0x98 => &d8_arithmetic_logical::sbc_a_b,
@@ -172,6 +175,7 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x9B => &d8_arithmetic_logical::sbc_a_e,
         0x9C => &d8_arithmetic_logical::sbc_a_h,
         0x9D => &d8_arithmetic_logical::sbc_a_l,
+        0x9E => &d8_arithmetic_logical::sbc_a_hl_dref,
         0x9F => &d8_arithmetic_logical::sbc_a_a,
 
         _ => &unimplement_op_fn,

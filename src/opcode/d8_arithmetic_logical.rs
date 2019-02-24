@@ -115,6 +115,14 @@ add_a_instruction!(add_a_e, e);
 add_a_instruction!(add_a_h, h);
 add_a_instruction!(add_a_l, l);
 
+// ADD A,(HL)
+// 1  8
+pub fn add_a_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    add(cpu, cpu.read_hl_dref());
+
+    (Cycle(8), OpLength(1))
+}
+
 // ADC A REG
 // 1  4
 macro_rules! adc_a_instruction {
@@ -134,6 +142,14 @@ adc_a_instruction!(adc_a_e, e);
 adc_a_instruction!(adc_a_h, h);
 adc_a_instruction!(adc_a_l, l);
 adc_a_instruction!(adc_a_a, a);
+
+// ADC A,(HL)
+// 1  8
+pub fn adc_a_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    adc(cpu, cpu.read_hl_dref());
+
+    (Cycle(8), OpLength(1))
+}
 
 // SUB REG
 // 1  4
@@ -155,6 +171,14 @@ sub_reg_instruction!(sub_a_h, h);
 sub_reg_instruction!(sub_a_l, l);
 sub_reg_instruction!(sub_a_a, a);
 
+// SUB (HL)
+// 1  8
+pub fn sub_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    sub(cpu, cpu.read_hl_dref());
+
+    (Cycle(8), OpLength(1))
+}
+
 // SBC REG
 // 1  4
 macro_rules! sbc_reg_instruction {
@@ -174,6 +198,14 @@ sbc_reg_instruction!(sbc_a_e, e);
 sbc_reg_instruction!(sbc_a_h, h);
 sbc_reg_instruction!(sbc_a_l, l);
 sbc_reg_instruction!(sbc_a_a, a);
+
+// SBC A,(HL)
+// 1  8
+pub fn sbc_a_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    sbc(cpu, cpu.read_hl_dref());
+
+    (Cycle(8), OpLength(1))
+}
 
 #[cfg(test)]
 mod tests {
