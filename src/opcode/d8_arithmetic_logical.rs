@@ -3,25 +3,75 @@ use crate::cpu::Cpu;
 use crate::opcode::table::{Cycle, OpLength};
 use crate::opcode::types::InstructionResult;
 
+// Z 0 H C
+fn add(cpu: &mut Cpu, val: u8) {
+    let a = cpu.registers.a();
+
+    let CarryTestResult {
+        val: result,
+        half_carry,
+        carry,
+    } = a.carry_add(val);
+
+    cpu.registers.set_a(result);
+
+    cpu.registers.flag.set_zero(result == 0);
+    cpu.registers.flag.set_sub(false);
+    cpu.registers.flag.set_half_carry(half_carry);
+    cpu.registers.flag.set_carry(carry);
+}
+
+// Z 0 H C
+fn adc(cpu: &mut Cpu, val: u8) {
+    let a = cpu.registers.a();
+    let cy = if cpu.registers.flag.carry() { 1 } else { 0 };
+
+    let CarryTestResult {
+        val,
+        half_carry: half_carry_a,
+        carry: carry_a,
+    } = a.carry_add(val);
+
+    let CarryTestResult {
+        val: result,
+        half_carry: half_carry_b,
+        carry: carry_b,
+    } = val.carry_add(cy);
+
+    // Since (a + b + 1) could only carry once, we use 'or' here.
+    let half_carry = half_carry_a || half_carry_b;
+    let carry = carry_a || carry_b;
+
+    cpu.registers.set_a(result);
+
+    cpu.registers.flag.set_zero(result == 0);
+    cpu.registers.flag.set_sub(false);
+    cpu.registers.flag.set_half_carry(half_carry);
+    cpu.registers.flag.set_carry(carry);
+}
+
+// Z 1 H C
+fn sub(cpu: &mut Cpu, val: u8) {
+    let a = cpu.registers.a();
+
+    let CarryTestResult {
+        val: result,
+        half_carry,
+        carry,
+    } = a.carry_sub(val);
+
+    cpu.registers.set_a(result);
+    cpu.registers.flag.set_zero(result == 0);
+    cpu.registers.flag.set_sub(true);
+    cpu.registers.flag.set_half_carry(half_carry);
+    cpu.registers.flag.set_carry(carry);
+}
+
 macro_rules! add_a_instruction {
     ($ins_name: ident, $from: ident) => {
         // Z 0 H C
         pub fn $ins_name(cpu: &mut Cpu) -> InstructionResult {
-            let a = cpu.registers.a();
-            let val = cpu.registers.$from();
-
-            let CarryTestResult {
-                val: result,
-                half_carry,
-                carry,
-            } = a.carry_add(val);
-
-            cpu.registers.set_a(result);
-
-            cpu.registers.flag.set_zero(result == 0);
-            cpu.registers.flag.set_sub(false);
-            cpu.registers.flag.set_half_carry(half_carry);
-            cpu.registers.flag.set_carry(carry);
+            add(cpu, cpu.registers.$from());
 
             (Cycle(4), OpLength(1))
         }
@@ -38,36 +88,10 @@ add_a_instruction!(add_a_l, l);
 
 // ADC A REG
 // 1  4
-// Z 0 H C
 macro_rules! adc_a_instruction {
     ($ins_name: ident, $from: ident) => {
         pub fn $ins_name(cpu: &mut Cpu) -> InstructionResult {
-            let a = cpu.registers.a();
-            let val = cpu.registers.$from();
-            let cy = if cpu.registers.flag.carry() { 1 } else { 0 };
-
-            let CarryTestResult {
-                val,
-                half_carry: half_carry_a,
-                carry: carry_a,
-            } = a.carry_add(val);
-
-            let CarryTestResult {
-                val: result,
-                half_carry: half_carry_b,
-                carry: carry_b,
-            } = val.carry_add(cy);
-
-            // Since (a + b + 1) could only carry once, we use 'or' here.
-            let half_carry = half_carry_a || half_carry_b;
-            let carry = carry_a || carry_b;
-
-            cpu.registers.set_a(result);
-
-            cpu.registers.flag.set_zero(result == 0);
-            cpu.registers.flag.set_sub(false);
-            cpu.registers.flag.set_half_carry(half_carry);
-            cpu.registers.flag.set_carry(carry);
+            adc(cpu, cpu.registers.$from());
 
             (Cycle(4), OpLength(1))
         }
@@ -84,24 +108,10 @@ adc_a_instruction!(adc_a_a, a);
 
 // SUB REG
 // 1  4
-// Z 1 H C
 macro_rules! sub_reg_instruction {
-    ($ins_name: ident, $reg_getter: ident) => {
+    ($ins_name: ident, $from: ident) => {
         pub fn $ins_name(cpu: &mut Cpu) -> InstructionResult {
-            let a = cpu.registers.a();
-            let reg = cpu.registers.$reg_getter();
-
-            let CarryTestResult {
-                val: result,
-                half_carry,
-                carry,
-            } = a.carry_sub(reg);
-
-            cpu.registers.set_a(result);
-            cpu.registers.flag.set_zero(result == 0);
-            cpu.registers.flag.set_sub(true);
-            cpu.registers.flag.set_half_carry(half_carry);
-            cpu.registers.flag.set_carry(carry);
+            sub(cpu, cpu.registers.$from());
 
             (Cycle(4), OpLength(1))
         }
