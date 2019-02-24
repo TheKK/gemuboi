@@ -111,6 +111,20 @@ fn and(cpu: &mut Cpu, val: u8) {
 }
 
 // Z 0 0 0
+fn xor(cpu: &mut Cpu, val: u8) {
+    let a = cpu.registers.a();
+
+    let result = a ^ val;
+
+    cpu.registers.set_a(result);
+
+    cpu.registers.flag.set_zero(result == 0);
+    cpu.registers.flag.set_sub(false);
+    cpu.registers.flag.set_half_carry(false);
+    cpu.registers.flag.set_carry(false);
+}
+
+// Z 0 0 0
 fn or(cpu: &mut Cpu, val: u8) {
     let a = cpu.registers.a();
 
@@ -1337,6 +1351,86 @@ mod tests {
             expected_cpu.registers.flag.set_carry(expected_carry);
 
             or(&mut actual_cpu, val);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+    }
+
+    mod xor {
+        use super::super::xor;
+
+        use crate::cpu::Cpu;
+
+        #[test]
+        fn normal_run() {
+            let reg_a = 0b11011010;
+            let val = 0b11110001;
+
+            let expected_a = reg_a ^ val;
+
+            let expected_zero = false;
+            let expected_sub = false;
+            let expected_half_carry = false;
+            let expected_carry = false;
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.set_a(reg_a);
+            actual_cpu.registers.flag.set_zero(!expected_zero);
+            actual_cpu.registers.flag.set_sub(!expected_sub);
+            actual_cpu
+                .registers
+                .flag
+                .set_half_carry(!expected_half_carry);
+            actual_cpu.registers.flag.set_carry(!expected_carry);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.set_a(expected_a);
+            expected_cpu.registers.flag.set_zero(expected_zero);
+            expected_cpu.registers.flag.set_sub(expected_sub);
+            expected_cpu
+                .registers
+                .flag
+                .set_half_carry(expected_half_carry);
+            expected_cpu.registers.flag.set_carry(expected_carry);
+
+            xor(&mut actual_cpu, val);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+
+        #[test]
+        fn run_with_zero_result() {
+            let reg_a = 0b11110000;
+            let val = 0b11110000;
+
+            let expected_a = reg_a ^ val;
+
+            let expected_zero = true;
+            let expected_sub = false;
+            let expected_half_carry = false;
+            let expected_carry = false;
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.set_a(reg_a);
+            actual_cpu.registers.flag.set_zero(!expected_zero);
+            actual_cpu.registers.flag.set_sub(!expected_sub);
+            actual_cpu
+                .registers
+                .flag
+                .set_half_carry(!expected_half_carry);
+            actual_cpu.registers.flag.set_carry(!expected_carry);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.set_a(expected_a);
+            expected_cpu.registers.flag.set_zero(expected_zero);
+            expected_cpu.registers.flag.set_sub(expected_sub);
+            expected_cpu
+                .registers
+                .flag
+                .set_half_carry(expected_half_carry);
+            expected_cpu.registers.flag.set_carry(expected_carry);
+
+            xor(&mut actual_cpu, val);
 
             assert_eq!(actual_cpu, expected_cpu);
         }
