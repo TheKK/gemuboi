@@ -2,6 +2,8 @@ use crate::carry_test::{CarryTest, CarryTestResult};
 use crate::cpu::Cpu;
 use crate::opcode::table::{Cycle, OpLength};
 use crate::opcode::types::InstructionResult;
+use crate::opcode::types::LoadFromFn;
+use crate::opcode::types::StoreToFn;
 
 // Z 0 H C
 fn add(cpu: &mut Cpu, val: u8) {
@@ -155,16 +157,16 @@ fn or(cpu: &mut Cpu, val: u8) {
 }
 
 // Z 0 H -
-fn inc(cpu: &mut Cpu) {
-    let a = cpu.registers.a();
+fn inc(cpu: &mut Cpu, load_from: &LoadFromFn<u8>, store_to: &StoreToFn<u8>) {
+    let a = load_from(&cpu).unwrap();
 
     let CarryTestResult {
         val: result,
         half_carry,
         ..
-    } = a.carry_add(1);
+    } = a.carry_add(1_u8);
 
-    cpu.registers.set_a(result);
+    store_to(cpu, result).unwrap();
 
     cpu.registers.flag.set_zero(result == 0);
     cpu.registers.flag.set_sub(false);
@@ -1677,6 +1679,17 @@ mod tests {
         use super::super::inc;
 
         use crate::cpu::Cpu;
+        use crate::opcode::ld_utils::load_from_reg;
+        use crate::opcode::ld_utils::store_to_reg;
+        use crate::registers::Registers;
+
+        fn inc_impl(cpu: &mut Cpu) {
+            inc(
+                cpu,
+                &load_from_reg(&Registers::a),
+                &store_to_reg(&Registers::set_a),
+            );
+        }
 
         fn run_with_half_carry_or_not(with_half_carry: bool) {
             let reg_a = if with_half_carry { 0b00001111 } else { 0 };
@@ -1700,7 +1713,7 @@ mod tests {
             expected_cpu.registers.flag.set_carry(expected_carry);
             expected_cpu.registers.flag.set_sub(false);
 
-            inc(&mut actual_cpu);
+            inc_impl(&mut actual_cpu);
 
             assert_eq!(actual_cpu, expected_cpu);
         }
@@ -1745,7 +1758,7 @@ mod tests {
             expected_cpu.registers.flag.set_carry(expected_carry);
             expected_cpu.registers.flag.set_sub(false);
 
-            inc(&mut actual_cpu);
+            inc_impl(&mut actual_cpu);
 
             assert_eq!(actual_cpu, expected_cpu);
         }
