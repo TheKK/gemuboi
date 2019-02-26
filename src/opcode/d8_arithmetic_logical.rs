@@ -163,7 +163,7 @@ fn or(cpu: &mut Cpu, val: u8) {
 
 // Z 0 H -
 fn inc(cpu: &mut Cpu, load_from: &LoadFromFn<u8>, store_to: &StoreToFn<u8>) {
-    let val = load_from(&cpu).unwrap();
+    let val = load_from(cpu).unwrap();
 
     let CarryTestResult {
         val: result,
