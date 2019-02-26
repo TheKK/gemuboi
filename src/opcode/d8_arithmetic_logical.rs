@@ -554,6 +554,16 @@ pub fn dec_hl_dref(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(12), OpLength(1))
 }
 
+// CCF
+// 1  4
+// - 0 0 C
+pub fn ccf(cpu: &mut Cpu) -> InstructionResult {
+    let carry = cpu.registers.flag.carry();
+    cpu.registers.flag.set_carry(!carry);
+
+    (Cycle(4), OpLength(1))
+}
+
 #[cfg(test)]
 mod tests {
     mod add_a {
@@ -1927,6 +1937,46 @@ mod tests {
             expected_cpu.registers.flag.set_sub(expected_sub);
 
             dec_impl(&mut actual_cpu);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+    }
+
+    mod ccf {
+        use super::super::ccf;
+
+        use crate::cpu::Cpu;
+
+        #[test]
+        fn run_with_carry() {
+            let init_carry = true;
+
+            let expected_carry = false;
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.flag.set_carry(init_carry);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.flag.set_carry(expected_carry);
+
+            ccf(&mut actual_cpu);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+
+        #[test]
+        fn run_without_carry() {
+            let init_carry = false;
+
+            let expected_carry = true;
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.flag.set_carry(init_carry);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.flag.set_carry(expected_carry);
+
+            ccf(&mut actual_cpu);
 
             assert_eq!(actual_cpu, expected_cpu);
         }
