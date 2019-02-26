@@ -577,6 +577,17 @@ pub fn cpl(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(4), OpLength(1))
 }
 
+// SCF
+// 1  4
+// - 0 0 1
+pub fn scf(cpu: &mut Cpu) -> InstructionResult {
+    cpu.registers.flag.set_sub(false);
+    cpu.registers.flag.set_half_carry(false);
+    cpu.registers.flag.set_carry(true);
+
+    (Cycle(4), OpLength(1))
+}
+
 #[cfg(test)]
 mod tests {
     mod add_a {
@@ -2027,6 +2038,48 @@ mod tests {
             cpl(&mut actual_cpu);
 
             assert_eq!(actual_cpu, expected_cpu);
+        }
+    }
+
+    mod scf {
+        use super::super::scf;
+
+        use crate::cpu::Cpu;
+
+        fn run_with_carry_or_not(init_carry: bool) {
+            let expected_sub = false;
+            let expected_half_carry = false;
+            let expected_carry = true;
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.flag.set_sub(!expected_sub);
+            actual_cpu
+                .registers
+                .flag
+                .set_half_carry(!expected_half_carry);
+            actual_cpu.registers.flag.set_carry(init_carry);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.flag.set_sub(expected_sub);
+            expected_cpu
+                .registers
+                .flag
+                .set_half_carry(expected_half_carry);
+            expected_cpu.registers.flag.set_carry(expected_carry);
+
+            scf(&mut actual_cpu);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+
+        #[test]
+        fn run_with_carry() {
+            run_with_carry_or_not(true);
+        }
+
+        #[test]
+        fn run_without_carry() {
+            run_with_carry_or_not(false);
         }
     }
 }
