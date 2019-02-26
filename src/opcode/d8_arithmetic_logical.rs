@@ -179,16 +179,16 @@ fn inc(cpu: &mut Cpu, load_from: &LoadFromFn<u8>, store_to: &StoreToFn<u8>) {
 }
 
 // Z 1 H -
-fn dec(cpu: &mut Cpu) {
-    let a = cpu.registers.a();
+fn dec(cpu: &mut Cpu, load_from: &LoadFromFn<u8>, store_to: &StoreToFn<u8>) {
+    let val = load_from(cpu).unwrap();
 
     let CarryTestResult {
         val: result,
         half_carry,
         ..
-    } = a.carry_sub(1);
+    } = val.carry_sub(1);
 
-    cpu.registers.set_a(result);
+    store_to(cpu, result).unwrap();
 
     cpu.registers.flag.set_zero(result == 0);
     cpu.registers.flag.set_sub(true);
@@ -1809,6 +1809,17 @@ mod tests {
         use super::super::dec;
 
         use crate::cpu::Cpu;
+        use crate::opcode::ld_utils::load_from_reg;
+        use crate::opcode::ld_utils::store_to_reg;
+        use crate::registers::Registers;
+
+        fn dec_impl(cpu: &mut Cpu) {
+            dec(
+                cpu,
+                &load_from_reg(&Registers::a),
+                &store_to_reg(&Registers::set_a),
+            );
+        }
 
         fn run_with_half_carry_or_not(with_half_carry: bool) {
             let reg_a = if with_half_carry { 0b00010000 } else { 2 };
@@ -1833,7 +1844,7 @@ mod tests {
             expected_cpu.registers.flag.set_carry(expected_carry);
             expected_cpu.registers.flag.set_sub(expected_sub);
 
-            dec(&mut actual_cpu);
+            dec_impl(&mut actual_cpu);
 
             assert_eq!(actual_cpu, expected_cpu);
         }
@@ -1879,7 +1890,7 @@ mod tests {
             expected_cpu.registers.flag.set_carry(expected_carry);
             expected_cpu.registers.flag.set_sub(expected_sub);
 
-            dec(&mut actual_cpu);
+            dec_impl(&mut actual_cpu);
 
             assert_eq!(actual_cpu, expected_cpu);
         }
