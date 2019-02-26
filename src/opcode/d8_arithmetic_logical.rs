@@ -1,9 +1,14 @@
 use crate::carry_test::{CarryTest, CarryTestResult};
 use crate::cpu::Cpu;
+use crate::opcode::ld_utils::load_byte_from_reg_dref;
+use crate::opcode::ld_utils::load_from_reg;
+use crate::opcode::ld_utils::store_to_reg;
+use crate::opcode::ld_utils::store_to_reg_dref;
 use crate::opcode::table::{Cycle, OpLength};
 use crate::opcode::types::InstructionResult;
 use crate::opcode::types::LoadFromFn;
 use crate::opcode::types::StoreToFn;
+use crate::registers::Registers;
 
 // Z 0 H C
 fn add(cpu: &mut Cpu, val: u8) {
@@ -475,6 +480,42 @@ pub fn or_d8(cpu: &mut Cpu) -> InstructionResult {
     or(cpu, cpu.read_byte_argument(1));
 
     (Cycle(8), OpLength(2))
+}
+
+// INC REG
+// 1  4
+macro_rules! inc_reg_instruction {
+    ($ins_name: ident, $from: ident, $to: ident) => {
+        pub fn $ins_name(cpu: &mut Cpu) -> InstructionResult {
+            inc(
+                cpu,
+                &load_from_reg(&Registers::$from),
+                &store_to_reg(&Registers::$to),
+            );
+
+            (Cycle(4), OpLength(1))
+        }
+    };
+}
+
+inc_reg_instruction!(inc_b, b, set_b);
+inc_reg_instruction!(inc_c, c, set_c);
+inc_reg_instruction!(inc_d, d, set_d);
+inc_reg_instruction!(inc_e, e, set_e);
+inc_reg_instruction!(inc_h, h, set_h);
+inc_reg_instruction!(inc_l, l, set_l);
+inc_reg_instruction!(inc_a, a, set_a);
+
+// INC (HL)
+// 1  12
+pub fn inc_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    inc(
+        cpu,
+        &load_byte_from_reg_dref(&Registers::hl),
+        &store_to_reg_dref(&Registers::hl),
+    );
+
+    (Cycle(12), OpLength(1))
 }
 
 #[cfg(test)]
