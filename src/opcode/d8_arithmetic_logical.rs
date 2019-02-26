@@ -518,6 +518,42 @@ pub fn inc_hl_dref(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(12), OpLength(1))
 }
 
+// DEC REG
+// 1  4
+macro_rules! dec_reg_instruction {
+    ($ins_name: ident, $from: ident, $to: ident) => {
+        pub fn $ins_name(cpu: &mut Cpu) -> InstructionResult {
+            dec(
+                cpu,
+                &load_from_reg(&Registers::$from),
+                &store_to_reg(&Registers::$to),
+            );
+
+            (Cycle(4), OpLength(1))
+        }
+    };
+}
+
+dec_reg_instruction!(dec_b, b, set_b);
+dec_reg_instruction!(dec_c, c, set_c);
+dec_reg_instruction!(dec_d, d, set_d);
+dec_reg_instruction!(dec_e, e, set_e);
+dec_reg_instruction!(dec_h, h, set_h);
+dec_reg_instruction!(dec_l, l, set_l);
+dec_reg_instruction!(dec_a, a, set_a);
+
+// DEC (HL)
+// 1  12
+pub fn dec_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    dec(
+        cpu,
+        &load_byte_from_reg_dref(&Registers::hl),
+        &store_to_reg_dref(&Registers::hl),
+    );
+
+    (Cycle(12), OpLength(1))
+}
+
 #[cfg(test)]
 mod tests {
     mod add_a {
