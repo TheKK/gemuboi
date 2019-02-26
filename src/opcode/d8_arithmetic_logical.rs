@@ -563,6 +563,18 @@ pub fn ccf(cpu: &mut Cpu) -> InstructionResult {
 
     (Cycle(4), OpLength(1))
 }
+// CPL
+// 1  4
+// - 1 1 -
+pub fn cpl(cpu: &mut Cpu) -> InstructionResult {
+    let a = cpu.registers.a();
+
+    cpu.registers.set_a(a ^ 0xFF);
+    cpu.registers.flag.set_sub(true);
+    cpu.registers.flag.set_half_carry(true);
+
+    (Cycle(4), OpLength(1))
+}
 
 #[cfg(test)]
 mod tests {
@@ -1977,6 +1989,41 @@ mod tests {
             expected_cpu.registers.flag.set_carry(expected_carry);
 
             ccf(&mut actual_cpu);
+
+            assert_eq!(actual_cpu, expected_cpu);
+        }
+    }
+
+    mod cpl {
+        use super::super::cpl;
+
+        use crate::cpu::Cpu;
+
+        #[test]
+        fn run() {
+            let init_a = 0b11011010;
+
+            let expected_a = 0b00100101;
+            let expected_sub = true;
+            let expected_half_carry = true;
+
+            let mut actual_cpu = Cpu::default();
+            actual_cpu.registers.set_a(init_a);
+            actual_cpu.registers.flag.set_sub(!expected_sub);
+            actual_cpu
+                .registers
+                .flag
+                .set_half_carry(!expected_half_carry);
+
+            let mut expected_cpu = actual_cpu.clone();
+            expected_cpu.registers.set_a(expected_a);
+            expected_cpu.registers.flag.set_sub(expected_sub);
+            expected_cpu
+                .registers
+                .flag
+                .set_half_carry(expected_half_carry);
+
+            cpl(&mut actual_cpu);
 
             assert_eq!(actual_cpu, expected_cpu);
         }
