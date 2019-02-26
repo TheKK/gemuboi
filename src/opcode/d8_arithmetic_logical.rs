@@ -563,6 +563,7 @@ pub fn ccf(cpu: &mut Cpu) -> InstructionResult {
 
     (Cycle(4), OpLength(1))
 }
+
 // CPL
 // 1  4
 // - 1 1 -
