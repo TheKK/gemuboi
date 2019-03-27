@@ -102,10 +102,45 @@ mod test {
     use super::*;
 
     #[test]
-    fn read_byte_with_incorrect_address() {
-        let mmu = Mmu::default();
+    fn read_byte_with_correct_address() {
+        const ADDR: Addr = 0x42;
+        const VAL: u8 = 0x99;
 
-        assert_eq!(mmu.read_byte(0xFF), INVALID_READ_DEFAULT_VALUE);
+        const EXPECTED_VAL: u8 = VAL;
+
+        let mut mmu = Mmu::default();
+        mmu.write_byte(ADDR, VAL).unwrap();
+
+        assert_eq!(mmu.read_byte(ADDR), VAL);
+    }
+
+    #[test]
+    fn read_byte_with_max_minus_one_address() {
+        use std::u16::MAX;
+
+        const ADDR: Addr = MAX - 1;
+        const VAL: u8 = 0x99;
+
+        const EXPECTED_VAL: u8 = VAL;
+
+        let mut mmu = Mmu::default();
+        mmu.write_byte(ADDR, VAL).unwrap();
+
+        assert_eq!(mmu.read_byte(ADDR), VAL);
+    }
+
+    #[test]
+    fn read_byte_with_max_address() {
+        use std::u16::MAX;
+
+        const ADDR: Addr = MAX;
+        const VAL: u8 = 0x99;
+
+        const EXPECTED_VAL: u8 = VAL;
+
+        let mut mmu = Mmu::default();
+        assert!(mmu.write_byte(ADDR, VAL).is_err());
+        assert_eq!(mmu.read_byte(ADDR), INVALID_READ_DEFAULT_VALUE);
     }
 
     #[test]
