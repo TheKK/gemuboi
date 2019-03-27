@@ -35,7 +35,7 @@ mod test {
 
             ld_bc_d16(&mut actual_cpu);
 
-            assert_eq!(actual_cpu.registers.bc(), expected_cpu.registers.bc());
+            assert_eq!(actual_cpu.registers, expected_cpu.registers);
         }
     }
 }
