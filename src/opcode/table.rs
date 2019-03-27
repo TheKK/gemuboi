@@ -249,6 +249,9 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
 
         // ld reg d16.
         0x01 => &ld_reg_d16::ld_bc_d16,
+        0x11 => &ld_reg_d16::ld_de_d16,
+        0x21 => &ld_reg_d16::ld_hl_d16,
+        0x31 => &ld_reg_d16::ld_sp_d16,
 
         _ => &unimplement_op_fn,
     }
