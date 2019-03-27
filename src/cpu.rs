@@ -22,7 +22,7 @@ impl Cpu {
     }
 
     pub fn read_byte_argument(&self, index: u16) -> u8 {
-        let arg_addr = self.registers.pc().saturating_add(index);
+        let arg_addr = self.registers.pc().wrapping_add(index);
 
         self.mmu.read_byte(arg_addr)
     }
