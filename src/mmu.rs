@@ -50,13 +50,14 @@ impl Mmu {
     }
 
     #[inline]
-    pub fn read_word(&self, addr: Addr) -> Result<u16> {
+    pub fn read_word(&self, addr: Addr) -> u16 {
         let addr = addr as usize;
 
-        let h = u16::from(*self.memory.get(addr).ok_or(Error::OutOfBound)?);
-        let l = u16::from(*self.memory.get(addr + 1).ok_or(Error::OutOfBound)?);
+        // TODO addr + 1 is possible overflowing.
+        let h = u16::from(*self.memory.get(addr).expect(""));
+        let l = u16::from(*self.memory.get(addr + 1).expect(""));
 
-        Ok((h << 8) + l)
+        (h << 8) + l
     }
 
     #[inline]
@@ -130,7 +131,7 @@ mod test {
             let value = 1024;
 
             assert!(mmu.write_word(addr, value).is_ok());
-            assert_eq!(mmu.read_word(addr).unwrap(), value);
+            assert_eq!(mmu.read_word(addr), value);
         };
 
         test(0x00);

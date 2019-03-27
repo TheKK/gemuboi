@@ -32,7 +32,7 @@ pub fn read_byte_from_pc_offset(offset: u16) -> impl Fn(&Cpu) -> mmu::Result<u8>
 }
 
 #[inline]
-pub fn read_word_from_pc_offset(offset: u16) -> impl Fn(&Cpu) -> mmu::Result<u16> {
+pub fn read_word_from_pc_offset(offset: u16) -> impl Fn(&Cpu) -> u16 {
     move |cpu| {
         let pc = cpu.registers.pc();
 
@@ -86,7 +86,7 @@ pub fn store_to_pc_offset_dref(offset: u16) -> impl Fn(&mut Cpu, u8) -> mmu::Res
     move |cpu, v| {
         let pc = cpu.registers.pc();
 
-        let the_addr = cpu.mmu.read_word(pc + offset)?;
+        let the_addr = cpu.mmu.read_word(pc + offset);
         cpu.mmu.write_byte(the_addr, v)?;
 
         Ok(())

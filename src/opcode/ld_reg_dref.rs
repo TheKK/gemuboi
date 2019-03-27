@@ -62,7 +62,7 @@ pub fn ld_a_a16_dref(cpu: &mut Cpu) -> (Cycle, OpLength) {
     ld(
         cpu,
         &|cpu| {
-            let addr = read_word_from_pc_offset(1)(cpu).unwrap();
+            let addr = read_word_from_pc_offset(1)(cpu);
 
             Ok(cpu.mmu.read_byte(addr))
         },
