@@ -16,26 +16,32 @@ pub fn ld_bc_d16(cpu: &mut Cpu) -> InstructionResult {
 
 #[cfg(test)]
 mod test {
-    mod ld_bc_d16 {
-        use super::super::*;
+    macro_rules! test_ld_reg_d16 {
+        ($inst: ident, $reg_setter: ident) => {
+            mod $inst {
+                use super::super::*;
 
-        use crate::cpu::Cpu;
+                use crate::cpu::Cpu;
 
-        #[test]
-        fn run() {
-            let pc = 0x42;
-            let expected_bc = 0x1234;
+                #[test]
+                fn run() {
+                    let pc = 0x42;
+                    let expected_bc = 0x1234;
 
-            let mut actual_cpu = Cpu::default();
-            actual_cpu.registers.set_pc(pc);
-            actual_cpu.mmu.write_word(pc + 1, expected_bc).unwrap();
+                    let mut actual_cpu = Cpu::default();
+                    actual_cpu.registers.set_pc(pc);
+                    actual_cpu.mmu.write_word(pc + 1, expected_bc).unwrap();
 
-            let mut expected_cpu = actual_cpu.clone();
-            expected_cpu.registers.set_bc(expected_bc);
+                    let mut expected_cpu = actual_cpu.clone();
+                    expected_cpu.registers.$reg_setter(expected_bc);
 
-            ld_bc_d16(&mut actual_cpu);
+                    $inst(&mut actual_cpu);
 
-            assert_eq!(actual_cpu.registers, expected_cpu.registers);
-        }
+                    assert_eq!(actual_cpu.registers, expected_cpu.registers);
+                }
+            }
+        };
     }
+
+    test_ld_reg_d16!(ld_bc_d16, set_bc);
 }
