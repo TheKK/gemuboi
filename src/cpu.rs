@@ -26,6 +26,12 @@ impl Cpu {
 
         self.mmu.read_byte(arg_addr)
     }
+
+    pub fn read_word_argument(&self, index: u16) -> u16 {
+        let arg_addr = self.registers.pc().wrapping_add(index);
+
+        self.mmu.read_word(arg_addr)
+    }
 }
 
 #[cfg(test)]
@@ -88,5 +94,37 @@ mod test {
             cpu.read_byte_argument(arg_index),
             INVALID_READ_DEFAULT_VALUE
         );
+    }
+
+    #[test]
+    fn read_word_argument_normal() {
+        let pc = 0x42;
+
+        let arg_index = 1;
+        let arg_value = 0x1234;
+
+        let mut cpu = Cpu::default();
+        cpu.mmu.write_word(pc + arg_index, arg_value).unwrap();
+        cpu.registers.set_pc(pc);
+
+        assert_eq!(cpu.read_word_argument(arg_index), arg_value);
+    }
+
+    #[test]
+    fn read_word_argument_out_of_bound() {
+        use std::u16::MAX;
+
+        let pc = 0x42_u16;
+
+        let arg_index = MAX;
+        let arg_value = 0x1234;
+
+        let mut cpu = Cpu::default();
+        cpu.mmu
+            .write_word(pc.wrapping_add(arg_index), arg_value)
+            .unwrap();
+        cpu.registers.set_pc(pc);
+
+        assert_eq!(cpu.read_word_argument(arg_index), arg_value);
     }
 }
