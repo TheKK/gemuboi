@@ -11,6 +11,8 @@ pub type Addr = u16;
 pub const MEM_SIZE: u16 = 0xFFFF;
 pub const INVALID_READ_DEFAULT_VALUE: u8 = 0;
 
+pub const INVALID_MEM_ACCESS_EXPECT: &str = "Invalid address access";
+
 #[derive(Clone)]
 pub struct Mmu {
     memory: [u8; MEM_SIZE as usize],
@@ -54,8 +56,8 @@ impl Mmu {
         let addr = addr as usize;
 
         // TODO addr + 1 is possible overflowing.
-        let h = u16::from(*self.memory.get(addr).expect(""));
-        let l = u16::from(*self.memory.get(addr + 1).expect(""));
+        let h = u16::from(*self.memory.get(addr).expect(INVALID_MEM_ACCESS_EXPECT));
+        let l = u16::from(*self.memory.get(addr + 1).expect(INVALID_MEM_ACCESS_EXPECT));
 
         (h << 8) + l
     }
