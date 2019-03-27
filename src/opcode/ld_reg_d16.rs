@@ -1,11 +1,17 @@
 use crate::cpu::Cpu;
 use crate::opcode::table::{Cycle, OpLength};
+use crate::opcode::types::InstructionResult;
+use crate::registers::Registers;
 
-pub fn ld_bc_d16(cpu: &mut Cpu) -> (Cycle, OpLength) {
+fn ld_reg_d16(cpu: &mut Cpu, reg_setter: &Fn(&mut Registers, u16)) -> InstructionResult {
     let d16 = cpu.read_word_argument(1);
-    cpu.registers.set_bc(d16);
+    reg_setter(&mut cpu.registers, d16);
 
     (Cycle(12), OpLength(3))
+}
+
+pub fn ld_bc_d16(cpu: &mut Cpu) -> InstructionResult {
+    ld_reg_d16(cpu, &Registers::set_bc)
 }
 
 #[cfg(test)]
