@@ -3,6 +3,7 @@ use crate::opcode::control;
 use crate::opcode::d16_arithmetic_logical;
 use crate::opcode::d8_arithmetic_logical;
 use crate::opcode::ld_dref_reg;
+use crate::opcode::ld_reg_d16;
 use crate::opcode::ld_reg_d8;
 use crate::opcode::ld_reg_dref;
 use crate::opcode::ld_reg_reg;
@@ -245,6 +246,9 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x37 => &d8_arithmetic_logical::scf,
 
         0x3F => &d8_arithmetic_logical::ccf,
+
+        // ld reg d16.
+        0x01 => &ld_reg_d16::ld_bc_d16,
 
         _ => &unimplement_op_fn,
     }
