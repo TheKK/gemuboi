@@ -55,9 +55,21 @@ impl Mmu {
     pub fn read_word(&self, addr: Addr) -> u16 {
         let addr = addr as usize;
 
-        // TODO addr + 1 is possible overflowing.
-        let h = u16::from(*self.memory.get(addr).expect(INVALID_MEM_ACCESS_EXPECT));
-        let l = u16::from(*self.memory.get(addr + 1).expect(INVALID_MEM_ACCESS_EXPECT));
+        let h_addr = addr;
+        let l_addr = addr.saturating_add(1);
+
+        let h = u16::from(
+            *self
+                .memory
+                .get(h_addr)
+                .unwrap_or(&INVALID_READ_DEFAULT_VALUE),
+        );
+        let l = u16::from(
+            *self
+                .memory
+                .get(l_addr)
+                .unwrap_or(&INVALID_READ_DEFAULT_VALUE),
+        );
 
         (h << 8) + l
     }
@@ -94,6 +106,48 @@ mod test {
         let mmu = Mmu::default();
 
         assert_eq!(mmu.read_byte(0xFF), INVALID_READ_DEFAULT_VALUE);
+    }
+
+    #[test]
+    fn read_word_with_correct_address() {
+        const ADDR: Addr = 0x42;
+        const VAL: u16 = 0x99;
+
+        const EXPECTED_VAL: u16 = VAL;
+
+        let mut mmu = Mmu::default();
+        mmu.write_word(ADDR, VAL).unwrap();
+
+        assert_eq!(mmu.read_word(ADDR), VAL);
+    }
+
+    #[test]
+    fn read_word_with_max_minus_one_address() {
+        use std::u16::MAX;
+
+        const ADDR: Addr = MAX - 1;
+        const VAL: u8 = 0x99;
+
+        const EXPECTED_VAL: u16 = (VAL as u16) << 8;
+
+        let mut mmu = Mmu::default();
+        mmu.write_byte(ADDR, VAL).unwrap();
+
+        assert_eq!(mmu.read_word(ADDR), EXPECTED_VAL);
+    }
+
+    #[test]
+    fn read_word_with_max_address() {
+        use std::u16::MAX;
+
+        const ADDR: Addr = MAX;
+        const VAL: u8 = 0x99;
+
+        const EXPECTED_VAL: u16 = INVALID_READ_DEFAULT_VALUE as u16;
+
+        let mut mmu = Mmu::default();
+        assert!(mmu.write_byte(ADDR, VAL).is_err());
+        assert_eq!(mmu.read_word(ADDR), EXPECTED_VAL);
     }
 
     #[test]
