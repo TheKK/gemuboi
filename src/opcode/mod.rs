@@ -6,6 +6,7 @@ pub mod ld_reg_d16;
 pub mod ld_reg_d8;
 pub mod ld_reg_dref;
 pub mod ld_reg_reg;
+pub mod load_16_bit;
 pub mod table;
 pub mod types;
 

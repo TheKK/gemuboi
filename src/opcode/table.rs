@@ -7,6 +7,7 @@ use crate::opcode::ld_reg_d16;
 use crate::opcode::ld_reg_d8;
 use crate::opcode::ld_reg_dref;
 use crate::opcode::ld_reg_reg;
+use crate::opcode::load_16_bit;
 
 pub type OpFn = Fn(&mut Cpu) -> (Cycle, OpLength);
 
@@ -252,6 +253,9 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x11 => &ld_reg_d16::ld_de_d16,
         0x21 => &ld_reg_d16::ld_hl_d16,
         0x31 => &ld_reg_d16::ld_sp_d16,
+
+        // 16 bit load.
+        0xF9 => &load_16_bit::ld_sp_hl,
 
         _ => &unimplement_op_fn,
     }
