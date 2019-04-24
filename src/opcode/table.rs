@@ -256,6 +256,7 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
 
         // 16 bit load.
         0xF9 => &load_16_bit::ld_sp_hl,
+        0x08 => &load_16_bit::ld_a16_sp,
 
         _ => &unimplement_op_fn,
     }
