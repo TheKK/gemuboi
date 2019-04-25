@@ -32,3 +32,27 @@ impl CarryTest for u8 {
         }
     }
 }
+
+impl CarryTest for u16 {
+    fn carry_add(self, rhs: Self) -> CarryTestResult<Self> {
+        let (val, carry) = self.overflowing_add(rhs);
+        let (_, half_carry) = (self << 8).overflowing_add(rhs << 8);
+
+        CarryTestResult {
+            val,
+            half_carry,
+            carry,
+        }
+    }
+
+    fn carry_sub(self, rhs: Self) -> CarryTestResult<Self> {
+        let (val, carry) = self.overflowing_sub(rhs);
+        let (_, half_carry) = (self & 0xFF).overflowing_sub(rhs & 0xFF);
+
+        CarryTestResult {
+            val,
+            half_carry,
+            carry,
+        }
+    }
+}
