@@ -1,4 +1,5 @@
 use std::default::Default;
+use std::ops::Deref;
 
 macro_rules! register_getter_and_setter {
   (8bits $([$reg:ident, $setter:ident]),*) => {
@@ -79,6 +80,25 @@ impl Default for Flag {
     }
 }
 
+impl Deref for Flag {
+    type Target = u8;
+
+    fn deref(&self) -> &Self::Target {
+        &0
+    }
+}
+
+impl From<u8> for Flag {
+    fn from(val: u8) -> Flag {
+        Flag {
+            zero: val & 128 > 0,
+            sub: val & 64 > 0,
+            half_carry: val & 32 > 0,
+            carry: val & 16 > 0,
+        }
+    }
+}
+
 impl Flag {
     flag_getter_and_setter![
         [zero, set_zero],
@@ -149,6 +169,23 @@ impl Registers {
     [d + e, de, set_de],
     [h + l, hl, set_hl]
   ];
+}
+
+impl Registers {
+    pub fn af(&self) -> u16 {
+        let h = u16::from(self.a) << 8;
+        let l = u16::from(*self.flag);
+
+        h + l
+    }
+
+    pub fn set_af(&mut self, val: u16) {
+        let h = ((val & 0xFF00) >> 8) as u8;
+        let l = (val & 0x00FF) as u8;
+
+        self.a = h;
+        self.flag = l.into();
+    }
 }
 
 #[cfg(test)]
