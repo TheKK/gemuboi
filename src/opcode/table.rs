@@ -2,6 +2,7 @@ use crate::cpu::Cpu;
 use crate::opcode::control;
 use crate::opcode::d16_arithmetic_logical;
 use crate::opcode::d8_arithmetic_logical;
+use crate::opcode::function;
 use crate::opcode::ld_dref_reg;
 use crate::opcode::ld_reg_d16;
 use crate::opcode::ld_reg_d8;
@@ -258,6 +259,12 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0xF9 => &load_16_bit::ld_sp_hl,
         0x08 => &load_16_bit::ld_a16_sp,
         0xF8 => &load_16_bit::ld_hl_sp_n,
+
+        // push
+        0xF5 => &function::push_af,
+        0xC5 => &function::push_bc,
+        0xD5 => &function::push_de,
+        0xE5 => &function::push_hl,
 
         _ => &unimplement_op_fn,
     }
