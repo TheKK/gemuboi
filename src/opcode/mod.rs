@@ -2,6 +2,7 @@ pub mod control;
 pub mod d16_arithmetic_logical;
 pub mod d8_arithmetic_logical;
 pub mod function;
+pub mod jumps;
 pub mod ld_dref_reg;
 pub mod ld_reg_d16;
 pub mod ld_reg_d8;

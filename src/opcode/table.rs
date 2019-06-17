@@ -3,6 +3,7 @@ use crate::opcode::control;
 use crate::opcode::d16_arithmetic_logical;
 use crate::opcode::d8_arithmetic_logical;
 use crate::opcode::function;
+use crate::opcode::jumps;
 use crate::opcode::ld_dref_reg;
 use crate::opcode::ld_reg_d16;
 use crate::opcode::ld_reg_d8;
@@ -271,6 +272,9 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0xC1 => &function::pop_bc,
         0xD1 => &function::pop_de,
         0xE1 => &function::pop_hl,
+
+        // jmps
+        0xC3 => &jumps::jp_nn,
 
         _ => &unimplement_op_fn,
     }
