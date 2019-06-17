@@ -266,6 +266,12 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0xD5 => &function::push_de,
         0xE5 => &function::push_hl,
 
+        // pop
+        0xF1 => &function::pop_af,
+        0xC1 => &function::pop_bc,
+        0xD1 => &function::pop_de,
+        0xE1 => &function::pop_hl,
+
         _ => &unimplement_op_fn,
     }
 }
