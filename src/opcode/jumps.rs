@@ -10,11 +10,10 @@ pub fn jp_nn(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(12), OpLength(3))
 }
 
-pub fn jp_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+pub fn jp_hl(cpu: &mut Cpu) -> InstructionResult {
     let hl = cpu.registers.hl();
-    let new_pc = cpu.mmu.read_word(hl);
 
-    cpu.registers.set_pc(new_pc);
+    cpu.registers.set_pc(hl);
 
     (Cycle(4), OpLength(1))
 }
@@ -59,21 +58,20 @@ mod test {
     }
 
     #[test]
-    fn run_jp_hl_dref() {
+    fn run_jp_hl() {
         let init_pc = 0xcc;
         let init_hl = 0x42;
 
-        let expected_pc = 0x4242;
+        let expected_pc = init_hl;
 
         let mut actual_cpu = Cpu::default();
         actual_cpu.registers.set_pc(init_pc);
         actual_cpu.registers.set_hl(init_hl);
-        actual_cpu.mmu.write_word(init_hl, expected_pc).unwrap();
 
         let mut expected_cpu = actual_cpu.clone();
         expected_cpu.registers.set_pc(expected_pc);
 
-        jp_hl_dref(&mut actual_cpu);
+        jp_hl(&mut actual_cpu);
 
         assert_eq!(actual_cpu, expected_cpu);
     }
