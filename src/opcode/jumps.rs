@@ -45,6 +45,30 @@ fn jp_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
     }
 }
 
+pub fn jr_n(cpu: &mut Cpu) -> InstructionResult {
+    jr_if(cpu, &|_| true)
+}
+
+#[inline]
+fn jr_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
+    let pc = cpu.registers.pc();
+    let pc_offset = cpu.read_byte_argument(1) as i8;
+
+    if cond(&cpu.registers) {
+        let new_pc = if pc_offset < 0 {
+            pc - (pc_offset.abs() as u16)
+        } else {
+            pc + (pc_offset as u16)
+        };
+
+        cpu.registers.set_pc(new_pc);
+
+        (Cycle(12), OpLength(2))
+    } else {
+        (Cycle(8), OpLength(2))
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::cpu::Cpu;
@@ -240,6 +264,45 @@ mod test {
         let expected_cpu = actual_cpu.clone();
 
         jp_c(&mut actual_cpu);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_jr_n_with_positive_value() {
+        let init_pc = 0xcc;
+        let n = 0x10;
+
+        let expected_pc = init_pc + u16::from(n);
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.mmu.write_byte(init_pc + 1, n).unwrap();
+
+        let mut expected_cpu = actual_cpu.clone();
+        expected_cpu.registers.set_pc(expected_pc);
+
+        jr_n(&mut actual_cpu);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_jr_n_with_negative_value() {
+        let init_pc = 0xcc;
+        let negative_n = -10_i8;
+        let n = negative_n as u8;
+
+        let expected_pc = init_pc - 10;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.mmu.write_byte(init_pc + 1, n).unwrap();
+
+        let mut expected_cpu = actual_cpu.clone();
+        expected_cpu.registers.set_pc(expected_pc);
+
+        jr_n(&mut actual_cpu);
 
         assert_eq!(actual_cpu, expected_cpu);
     }
