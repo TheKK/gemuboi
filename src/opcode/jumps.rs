@@ -26,6 +26,14 @@ pub fn jp_z(cpu: &mut Cpu) -> InstructionResult {
     jp_if(cpu, &|registers: &Registers| registers.flag.zero())
 }
 
+pub fn jp_nc(cpu: &mut Cpu) -> InstructionResult {
+    jp_if(cpu, &|registers: &Registers| !registers.flag.carry())
+}
+
+pub fn jp_c(cpu: &mut Cpu) -> InstructionResult {
+    jp_if(cpu, &|registers: &Registers| registers.flag.carry())
+}
+
 fn jp_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
     let new_pc = cpu.read_word_argument(1);
 
@@ -154,6 +162,84 @@ mod test {
         let expected_cpu = actual_cpu.clone();
 
         jp_z(&mut actual_cpu);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_jp_nc_with_carry_flag_set() {
+        let init_pc = 0xcc;
+        let carry_flag = true;
+
+        let expected_pc = 0x4242;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.registers.flag.set_carry(carry_flag);
+        actual_cpu.mmu.write_word(init_pc + 1, expected_pc).unwrap();
+
+        let expected_cpu = actual_cpu.clone();
+
+        jp_nc(&mut actual_cpu);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_jp_nc_with_carry_flag_unset() {
+        let init_pc = 0xcc;
+        let carry_flag = false;
+
+        let expected_pc = 0x4242;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.registers.flag.set_carry(carry_flag);
+        actual_cpu.mmu.write_word(init_pc + 1, expected_pc).unwrap();
+
+        let mut expected_cpu = actual_cpu.clone();
+        expected_cpu.registers.set_pc(expected_pc);
+
+        jp_nc(&mut actual_cpu);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_jp_c_with_carry_flag_set() {
+        let init_pc = 0xcc;
+        let carry_flag = true;
+
+        let expected_pc = 0x4242;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.registers.flag.set_carry(carry_flag);
+        actual_cpu.mmu.write_word(init_pc + 1, expected_pc).unwrap();
+
+        let mut expected_cpu = actual_cpu.clone();
+        expected_cpu.registers.set_pc(expected_pc);
+
+        jp_c(&mut actual_cpu);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_jp_c_with_carry_flag_unset() {
+        let init_pc = 0xcc;
+        let carry_flag = false;
+
+        let expected_pc = 0x4242;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.registers.flag.set_carry(carry_flag);
+        actual_cpu.mmu.write_word(init_pc + 1, expected_pc).unwrap();
+
+        let expected_cpu = actual_cpu.clone();
+
+        jp_c(&mut actual_cpu);
 
         assert_eq!(actual_cpu, expected_cpu);
     }
