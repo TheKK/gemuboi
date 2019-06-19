@@ -69,12 +69,28 @@ fn pop_reg(cpu: &mut Cpu, set_reg: &Fn(&mut Registers, u16)) -> InstructionResul
     (Cycle(12), OpLength(1))
 }
 
+#[inline]
+fn call_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
+    if cond(&cpu.registers) {
+        let new_pc = cpu.read_word_argument(1);
+        let new_sp = cpu.registers.sp() - 2;
+        let ret_pc = cpu.registers.pc() + 3;
+
+        cpu.registers.set_pc(new_pc);
+        cpu.registers.set_sp(new_sp);
+        cpu.mmu.write_word(new_sp, ret_pc).unwrap();
+
+        (Cycle(24), OpLength(3))
+    } else {
+        (Cycle(12), OpLength(3))
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::cpu::Cpu;
 
-    use super::pop;
-    use super::push;
+    use super::*;
 
     #[test]
     fn run_push() {
@@ -115,6 +131,55 @@ mod test {
         let actual_popped_value = pop(&mut actual_cpu);
 
         assert_eq!(actual_popped_value, expected_popped_value);
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_call_if_with_true() {
+        let init_pc = 0x55;
+        let init_sp = 0x42;
+
+        let nn = 0x12;
+
+        let expected_pc = nn;
+        let expected_sp = init_sp - 2;
+
+        let expected_next_pc = init_pc + 3;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.registers.set_sp(init_sp);
+        actual_cpu.mmu.write_word(init_pc + 1, nn).unwrap();
+
+        let mut expected_cpu = actual_cpu.clone();
+        expected_cpu.registers.set_pc(expected_pc);
+        expected_cpu.registers.set_sp(expected_sp);
+        expected_cpu
+            .mmu
+            .write_word(expected_sp, expected_next_pc)
+            .unwrap();
+
+        call_if(&mut actual_cpu, &|_| true);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_call_if_with_false() {
+        let init_pc = 0x55;
+        let init_sp = 0x42;
+
+        let nn = 0x12;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.registers.set_sp(init_sp);
+        actual_cpu.mmu.write_word(init_pc + 1, nn).unwrap();
+
+        let expected_cpu = actual_cpu.clone();
+
+        call_if(&mut actual_cpu, &|_| false);
+
         assert_eq!(actual_cpu, expected_cpu);
     }
 }
