@@ -69,6 +69,26 @@ fn pop_reg(cpu: &mut Cpu, set_reg: &Fn(&mut Registers, u16)) -> InstructionResul
     (Cycle(12), OpLength(1))
 }
 
+pub fn call_nn(cpu: &mut Cpu) -> InstructionResult {
+    call_if(cpu, &|_| true)
+}
+
+pub fn call_nz(cpu: &mut Cpu) -> InstructionResult {
+    call_if(cpu, &|registers| !registers.flag.zero())
+}
+
+pub fn call_z(cpu: &mut Cpu) -> InstructionResult {
+    call_if(cpu, &|registers| registers.flag.zero())
+}
+
+pub fn call_nc(cpu: &mut Cpu) -> InstructionResult {
+    call_if(cpu, &|registers| !registers.flag.carry())
+}
+
+pub fn call_c(cpu: &mut Cpu) -> InstructionResult {
+    call_if(cpu, &|registers| registers.flag.carry())
+}
+
 #[inline]
 fn call_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
     if cond(&cpu.registers) {
