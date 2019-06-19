@@ -34,6 +34,7 @@ pub fn jp_c(cpu: &mut Cpu) -> InstructionResult {
     jp_if(cpu, &|registers: &Registers| registers.flag.carry())
 }
 
+#[inline]
 fn jp_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
     let new_pc = cpu.read_word_argument(1);
 
