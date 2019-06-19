@@ -273,7 +273,7 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0xD1 => &function::pop_de,
         0xE1 => &function::pop_hl,
 
-        // jmps
+        // jumps
         0xC3 => &jumps::jp_nn,
         0xE9 => &jumps::jp_hl,
         0xC2 => &jumps::jp_nz,
