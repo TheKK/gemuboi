@@ -49,6 +49,22 @@ pub fn jr_n(cpu: &mut Cpu) -> InstructionResult {
     jr_if(cpu, &|_| true)
 }
 
+pub fn jr_nz(cpu: &mut Cpu) -> InstructionResult {
+    jr_if(cpu, &|registers: &Registers| !registers.flag.zero())
+}
+
+pub fn jr_z(cpu: &mut Cpu) -> InstructionResult {
+    jr_if(cpu, &|registers: &Registers| registers.flag.zero())
+}
+
+pub fn jr_nc(cpu: &mut Cpu) -> InstructionResult {
+    jr_if(cpu, &|registers: &Registers| !registers.flag.carry())
+}
+
+pub fn jr_c(cpu: &mut Cpu) -> InstructionResult {
+    jr_if(cpu, &|registers: &Registers| registers.flag.carry())
+}
+
 #[inline]
 fn jr_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
     let pc = cpu.registers.pc();

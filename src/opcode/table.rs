@@ -282,6 +282,10 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0xDA => &jumps::jp_c,
 
         0x18 => &jumps::jr_n,
+        0x20 => &jumps::jr_nz,
+        0x28 => &jumps::jr_z,
+        0x30 => &jumps::jr_nc,
+        0x38 => &jumps::jr_c,
 
         _ => &unimplement_op_fn,
     }
