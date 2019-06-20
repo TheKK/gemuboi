@@ -116,6 +116,22 @@ pub fn ret(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(16), OpLength(1))
 }
 
+pub fn ret_nz(cpu: &mut Cpu) -> InstructionResult {
+    ret_if(cpu, &|registers| !registers.flag.zero())
+}
+
+pub fn ret_z(cpu: &mut Cpu) -> InstructionResult {
+    ret_if(cpu, &|registers| registers.flag.zero())
+}
+
+pub fn ret_nc(cpu: &mut Cpu) -> InstructionResult {
+    ret_if(cpu, &|registers| !registers.flag.carry())
+}
+
+pub fn ret_c(cpu: &mut Cpu) -> InstructionResult {
+    ret_if(cpu, &|registers| registers.flag.carry())
+}
+
 #[inline]
 fn ret_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
     if cond(&cpu.registers) {
