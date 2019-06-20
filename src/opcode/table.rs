@@ -282,6 +282,7 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0xDC => &function::call_c,
 
         0xC9 => &function::ret,
+        0xD9 => &function::reti,
 
         0xC0 => &function::ret_nz,
         0xC8 => &function::ret_z,
