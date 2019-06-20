@@ -116,6 +116,17 @@ pub fn ret(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(16), OpLength(1))
 }
 
+#[inline]
+fn ret_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
+    if cond(&cpu.registers) {
+        let _ = ret(cpu);
+
+        (Cycle(20), OpLength(1))
+    } else {
+        (Cycle(8), OpLength(1))
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::cpu::Cpu;
@@ -233,6 +244,49 @@ mod test {
         expected_cpu.registers.set_sp(expected_sp);
 
         ret(&mut actual_cpu);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_ret_if_with_true() {
+        let init_pc = 0x55;
+        let init_sp = 0x42;
+
+        let ret_pc = 0x12;
+
+        let expected_pc = ret_pc;
+        let expected_sp = init_sp + 2;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.registers.set_sp(init_sp);
+        actual_cpu.mmu.write_word(init_sp, ret_pc).unwrap();
+
+        let mut expected_cpu = actual_cpu.clone();
+        expected_cpu.registers.set_pc(expected_pc);
+        expected_cpu.registers.set_sp(expected_sp);
+
+        ret_if(&mut actual_cpu, &|_| true);
+
+        assert_eq!(actual_cpu, expected_cpu);
+    }
+
+    #[test]
+    fn run_ret_if_with_false() {
+        let init_pc = 0x55;
+        let init_sp = 0x42;
+
+        let ret_pc = 0x12;
+
+        let mut actual_cpu = Cpu::default();
+        actual_cpu.registers.set_pc(init_pc);
+        actual_cpu.registers.set_sp(init_sp);
+        actual_cpu.mmu.write_word(init_sp, ret_pc).unwrap();
+
+        let expected_cpu = actual_cpu.clone();
+
+        ret_if(&mut actual_cpu, &|_| false);
 
         assert_eq!(actual_cpu, expected_cpu);
     }
