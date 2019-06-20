@@ -6,6 +6,8 @@ use crate::registers::Registers;
 pub struct Cpu {
     pub(crate) registers: Registers,
     pub(crate) mmu: Mmu,
+
+    ime: bool,
 }
 
 impl Cpu {
@@ -31,6 +33,15 @@ impl Cpu {
         let arg_addr = self.registers.pc().wrapping_add(index);
 
         self.mmu.read_word(arg_addr)
+    }
+
+    pub fn set_ime(&mut self, to: bool) {
+        self.ime = to;
+    }
+
+    #[cfg(test)]
+    pub const fn ime(&self) -> bool {
+        self.ime
     }
 }
 
