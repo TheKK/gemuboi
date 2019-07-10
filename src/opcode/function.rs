@@ -149,6 +149,38 @@ fn ret_if(cpu: &mut Cpu, cond: &Fn(&Registers) -> bool) -> InstructionResult {
     }
 }
 
+pub fn rst_00h(cpu: &mut Cpu) -> InstructionResult {
+    rst_to(cpu, 0x00)
+}
+
+pub fn rst_08h(cpu: &mut Cpu) -> InstructionResult {
+    rst_to(cpu, 0x08)
+}
+
+pub fn rst_10h(cpu: &mut Cpu) -> InstructionResult {
+    rst_to(cpu, 0x10)
+}
+
+pub fn rst_18h(cpu: &mut Cpu) -> InstructionResult {
+    rst_to(cpu, 0x18)
+}
+
+pub fn rst_20h(cpu: &mut Cpu) -> InstructionResult {
+    rst_to(cpu, 0x20)
+}
+
+pub fn rst_28h(cpu: &mut Cpu) -> InstructionResult {
+    rst_to(cpu, 0x28)
+}
+
+pub fn rst_30h(cpu: &mut Cpu) -> InstructionResult {
+    rst_to(cpu, 0x30)
+}
+
+pub fn rst_38h(cpu: &mut Cpu) -> InstructionResult {
+    rst_to(cpu, 0x38)
+}
+
 #[inline]
 fn rst_to(cpu: &mut Cpu, new_pc: u16) -> InstructionResult {
     let ret_pc = cpu.registers.pc().wrapping_add(1);
