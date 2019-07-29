@@ -1,3 +1,21 @@
+use crate::cpu::Cpu;
+use crate::opcode::table::{Cycle, OpLength};
+use crate::opcode::types::InstructionResult;
+
+pub fn rlca(cpu: &mut Cpu) -> InstructionResult {
+    let (new_a, carry) = rlc(cpu.registers.a());
+
+    cpu.registers.set_a(new_a);
+
+    let flag = &mut cpu.registers.flag;
+    flag.set_zero(new_a == 0);
+    flag.set_sub(false);
+    flag.set_half_carry(false);
+    flag.set_carry(carry);
+
+    (Cycle(4), OpLength(1))
+}
+
 #[inline]
 fn rlc(input: u8) -> (u8, bool) {
     let carry = 0b1000_0000 & input != 0;

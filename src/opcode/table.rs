@@ -10,6 +10,7 @@ use crate::opcode::ld_reg_d8;
 use crate::opcode::ld_reg_dref;
 use crate::opcode::ld_reg_reg;
 use crate::opcode::load_16_bit;
+use crate::opcode::rotate;
 
 pub type OpFn = Fn(&mut Cpu) -> (Cycle, OpLength);
 
@@ -311,6 +312,9 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x28 => &jumps::jr_z,
         0x30 => &jumps::jr_nc,
         0x38 => &jumps::jr_c,
+
+        // rotates
+        0x07 => &rotate::rlca,
 
         _ => &unimplement_op_fn,
     }
