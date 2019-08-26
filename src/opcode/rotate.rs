@@ -4,15 +4,10 @@ use crate::opcode::types::InstructionResult;
 use crate::registers::Flag;
 
 pub fn rlca(cpu: &mut Cpu) -> InstructionResult {
-    let (new_a, carry) = rlc(cpu.registers.a());
+    let (new_a, new_flag) = rlc(cpu.registers.a());
 
     cpu.registers.set_a(new_a);
-
-    let flag = &mut cpu.registers.flag;
-    flag.set_zero(new_a == 0);
-    flag.set_sub(false);
-    flag.set_half_carry(false);
-    flag.set_carry(carry);
+    cpu.registers.flag = new_flag;
 
     (Cycle(4), OpLength(1))
 }
@@ -27,10 +22,11 @@ pub fn rla(cpu: &mut Cpu) -> InstructionResult {
 }
 
 #[inline]
-fn rlc(input: u8) -> (u8, bool) {
+fn rlc(input: u8) -> (u8, Flag) {
     let carry = 0b1000_0000 & input != 0;
+    let new_value = input.rotate_left(1);
 
-    (input.rotate_left(1), carry)
+    (new_value, Flag::new(new_value == 0, false, false, carry))
 }
 
 #[inline]
@@ -59,8 +55,18 @@ mod test {
 
     #[test]
     fn run_rlc() {
-        assert_eq!(rlc(0b01010101), (0b10101010, false));
-        assert_eq!(rlc(0b11111110), (0b11111101, true));
+        assert_eq!(
+            rlc(0b00000000),
+            (0b00000000, Flag::new(true, false, false, false))
+        );
+        assert_eq!(
+            rlc(0b10000000),
+            (0b00000001, Flag::new(false, false, false, true))
+        );
+        assert_eq!(
+            rlc(0b00000001),
+            (0b00000010, Flag::new(false, false, false, false))
+        );
     }
 
     #[test]
