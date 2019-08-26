@@ -52,13 +52,12 @@ fn rl(carry: bool, input: u8) -> (u8, Flag) {
     let carry_bit = if carry { 1 } else { 0 };
 
     let new_carry = 0b1000_0000 & input != 0;
-    let result = (input.rotate_left(1) & 0b1111_1110) + carry_bit;
+    let new_value = (input.rotate_left(1) & 0b1111_1110) + carry_bit;
 
-    let mut new_flags = Flag::default();
-    new_flags.set_zero(result == 0);
-    new_flags.set_carry(new_carry);
-
-    (result, new_flags)
+    (
+        new_value,
+        Flag::new(new_value == 0, false, false, new_carry),
+    )
 }
 
 #[inline]
@@ -74,9 +73,12 @@ fn rr(carry: bool, input: u8) -> (u8, Flag) {
     let carry_bit = if carry { 1 } else { 0 };
 
     let new_carry = 0b0000_0001 & input != 0;
-    let result = (input.rotate_right(1) & 0b0111_1111) + (carry_bit << 7);
+    let new_value = (input.rotate_right(1) & 0b0111_1111) + (carry_bit << 7);
 
-    (result, Flag::new(result == 0, false, false, new_carry))
+    (
+        new_value,
+        Flag::new(new_value == 0, false, false, new_carry),
+    )
 }
 
 #[cfg(test)]
