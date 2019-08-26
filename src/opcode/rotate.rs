@@ -5,12 +5,19 @@ use crate::registers::Flag;
 
 macro_rules! cb {
     (rlc => $fn_name:ident, $getter:ident, $setter:ident) => {
-        cb!(rlc, $fn_name, $getter, $setter);
-    };
-
-    ($rotate_fn:ident, $fn_name:ident, $getter:ident, $setter:ident) => {
         pub fn $fn_name(cpu: &mut Cpu) -> InstructionResult {
             let (new_reg, new_flag) = rlc(cpu.registers.$getter());
+
+            cpu.registers.$setter(new_reg);
+            cpu.registers.flag = new_flag;
+
+            (Cycle(8), OpLength(1))
+        }
+    };
+
+    (rl => $fn_name:ident, $getter:ident, $setter:ident) => {
+        pub fn $fn_name(cpu: &mut Cpu) -> InstructionResult {
+            let (new_reg, new_flag) = rl(cpu.registers.flag.carry(), cpu.registers.$getter());
 
             cpu.registers.$setter(new_reg);
             cpu.registers.flag = new_flag;
@@ -31,6 +38,24 @@ cb!(rlc => cb_rlcl, l, set_l);
 pub fn cb_rlc_hl_dref(cpu: &mut Cpu) -> InstructionResult {
     let hl = cpu.registers.hl();
     let (new_value, new_flag) = rlc(cpu.read_hl_dref());
+
+    cpu.mmu.write_byte(hl, new_value).unwrap();
+    cpu.registers.flag = new_flag;
+
+    (Cycle(16), OpLength(1))
+}
+
+cb!(rl => cb_rla, a, set_a);
+cb!(rl => cb_rlb, b, set_b);
+cb!(rl => cb_rlc, c, set_c);
+cb!(rl => cb_rld, d, set_d);
+cb!(rl => cb_rle, e, set_e);
+cb!(rl => cb_rlh, h, set_h);
+cb!(rl => cb_rll, l, set_l);
+
+pub fn cb_rl_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    let hl = cpu.registers.hl();
+    let (new_value, new_flag) = rl(cpu.registers.flag.carry(), cpu.read_hl_dref());
 
     cpu.mmu.write_byte(hl, new_value).unwrap();
     cpu.registers.flag = new_flag;

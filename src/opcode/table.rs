@@ -339,6 +339,15 @@ fn cb_prefix(cpu: &mut Cpu) -> (Cycle, OpLength) {
         0x05 => &rotate::cb_rlcl,
         0x06 => &rotate::cb_rlc_hl_dref,
 
+        0x17 => &rotate::cb_rla,
+        0x10 => &rotate::cb_rlb,
+        0x11 => &rotate::cb_rlc,
+        0x12 => &rotate::cb_rld,
+        0x13 => &rotate::cb_rle,
+        0x14 => &rotate::cb_rlh,
+        0x15 => &rotate::cb_rll,
+        0x16 => &rotate::cb_rl_hl_dref,
+
         _ => unimplemented!(),
     };
 
