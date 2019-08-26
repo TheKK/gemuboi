@@ -100,6 +100,15 @@ impl From<u8> for Flag {
 }
 
 impl Flag {
+    pub fn new(zero: bool, sub: bool, half_carry: bool, carry: bool) -> Self {
+        Self {
+            zero,
+            sub,
+            half_carry,
+            carry,
+        }
+    }
+
     flag_getter_and_setter![
         [zero, set_zero],
         [sub, set_sub],
