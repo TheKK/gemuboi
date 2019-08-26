@@ -319,6 +319,13 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x0F => &rotate::rrca,
         0x1F => &rotate::rra,
 
+        // CB-prefix
+        0xCB => &cb_prefix,
+
         _ => &unimplement_op_fn,
     }
+}
+
+fn cb_prefix(_cpu: &mut Cpu) -> (Cycle, OpLength) {
+    unimplemented!();
 }
