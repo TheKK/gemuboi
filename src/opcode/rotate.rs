@@ -30,6 +30,15 @@ pub fn rrca(cpu: &mut Cpu) -> InstructionResult {
     (Cycle(4), OpLength(1))
 }
 
+pub fn rra(cpu: &mut Cpu) -> InstructionResult {
+    let (new_a, new_flags) = rr(cpu.registers.flag.carry(), cpu.registers.a());
+
+    cpu.registers.set_a(new_a);
+    cpu.registers.flag = new_flags;
+
+    (Cycle(4), OpLength(1))
+}
+
 #[inline]
 fn rlc(input: u8) -> (u8, Flag) {
     let carry = 0b1000_0000 & input != 0;
@@ -60,7 +69,15 @@ fn rrc(input: u8) -> (u8, Flag) {
     (new_value, Flag::new(new_value == 0, false, false, carry))
 }
 
-fn rr() {}
+#[inline]
+fn rr(carry: bool, input: u8) -> (u8, Flag) {
+    let carry_bit = if carry { 1 } else { 0 };
+
+    let new_carry = 0b0000_0001 & input != 0;
+    let result = (input.rotate_right(1) & 0b0111_1111) + (carry_bit << 7);
+
+    (result, Flag::new(result == 0, false, false, new_carry))
+}
 
 #[cfg(test)]
 mod test {
@@ -117,6 +134,26 @@ mod test {
         assert_eq!(
             rrc(0b00000001),
             (0b10000000, Flag::new(false, false, false, true))
+        );
+    }
+
+    #[test]
+    fn run_rr() {
+        assert_eq!(
+            rr(true, 0b00000000),
+            (0b10000000, Flag::new(false, false, false, false))
+        );
+        assert_eq!(
+            rr(false, 0b00000000),
+            (0b00000000, Flag::new(true, false, false, false))
+        );
+        assert_eq!(
+            rr(true, 0b00000001),
+            (0b10000000, Flag::new(false, false, false, true))
+        );
+        assert_eq!(
+            rr(false, 0b00000001),
+            (0b00000000, Flag::new(true, false, false, true))
         );
     }
 }

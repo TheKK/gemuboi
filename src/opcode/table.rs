@@ -317,6 +317,7 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
         0x07 => &rotate::rlca,
         0x17 => &rotate::rla,
         0x0F => &rotate::rrca,
+        0x1F => &rotate::rra,
 
         _ => &unimplement_op_fn,
     }
