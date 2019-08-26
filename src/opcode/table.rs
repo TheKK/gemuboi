@@ -329,6 +329,8 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
 fn cb_prefix(cpu: &mut Cpu) -> (Cycle, OpLength) {
     let cb_argument = cpu.read_byte_argument(1);
 
+    cpu.registers.set_pc(cpu.registers.pc() + 1);
+
     let cb_fn: &'static OpFn = match cb_argument {
         0x07 => &rotate::cb_rlca,
         0x00 => &rotate::cb_rlcb,
