@@ -326,6 +326,21 @@ pub fn op_table(op_code: u8) -> &'static OpFn {
     }
 }
 
-fn cb_prefix(_cpu: &mut Cpu) -> (Cycle, OpLength) {
-    unimplemented!();
+fn cb_prefix(cpu: &mut Cpu) -> (Cycle, OpLength) {
+    let cb_argument = cpu.read_byte_argument(1);
+
+    let cb_fn: &'static OpFn = match cb_argument {
+        0x07 => &rotate::cb_rlca,
+        0x00 => &rotate::cb_rlcb,
+        0x01 => &rotate::cb_rlcc,
+        0x02 => &rotate::cb_rlcd,
+        0x03 => &rotate::cb_rlce,
+        0x04 => &rotate::cb_rlch,
+        0x05 => &rotate::cb_rlcl,
+        0x06 => &rotate::cb_rlc_hl_dref,
+
+        _ => unimplemented!(),
+    };
+
+    cb_fn(cpu)
 }

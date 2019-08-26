@@ -3,6 +3,41 @@ use crate::opcode::table::{Cycle, OpLength};
 use crate::opcode::types::InstructionResult;
 use crate::registers::Flag;
 
+macro_rules! cb {
+    (rlc => $fn_name:ident, $getter:ident, $setter:ident) => {
+        cb!(rlc, $fn_name, $getter, $setter);
+    };
+
+    ($rotate_fn:ident, $fn_name:ident, $getter:ident, $setter:ident) => {
+        pub fn $fn_name(cpu: &mut Cpu) -> InstructionResult {
+            let (new_reg, new_flag) = rlc(cpu.registers.$getter());
+
+            cpu.registers.$setter(new_reg);
+            cpu.registers.flag = new_flag;
+
+            (Cycle(8), OpLength(1))
+        }
+    };
+}
+
+cb!(rlc => cb_rlca, a, set_a);
+cb!(rlc => cb_rlcb, b, set_b);
+cb!(rlc => cb_rlcc, c, set_c);
+cb!(rlc => cb_rlcd, d, set_d);
+cb!(rlc => cb_rlce, e, set_e);
+cb!(rlc => cb_rlch, h, set_h);
+cb!(rlc => cb_rlcl, l, set_l);
+
+pub fn cb_rlc_hl_dref(cpu: &mut Cpu) -> InstructionResult {
+    let hl = cpu.registers.hl();
+    let (new_value, new_flag) = rlc(cpu.read_hl_dref());
+
+    cpu.mmu.write_byte(hl, new_value).unwrap();
+    cpu.registers.flag = new_flag;
+
+    (Cycle(16), OpLength(1))
+}
+
 pub fn rlca(cpu: &mut Cpu) -> InstructionResult {
     let (new_a, new_flag) = rlc(cpu.registers.a());
 
